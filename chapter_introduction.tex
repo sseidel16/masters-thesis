@@ -1,0 +1,150 @@
+\chapter{Introduction} \label{chptr:introduction}
+
+Large complex engineered systems involve many separate components interacting to ensure the proper functionality of the whole system.
+Examples of these complex engineered systems are computer networks such as the internet.
+Computer networks include separate components in many layers spanning from the physical to the application layer that all affect the proper functionality of the network.
+There are parameters ({\em factors}) at every layer that can be adjusted to different values ({\em levels}) to affect the output ({\em response}) of the system.
+Levels can therefore be assigned to the factors of the system, and a response can be observed.
+
+Suppose we are interested in maximizing throughput for a particular network.
+Many network factors at multiple layers can affect the response (the throughput of the network).
+For example, the type of cable at the physical layer, the protocol at the transport layer, and the number of sockets at the application layer all might affect the network throughput.
+The effects of these factors may be due to the assignment of a particular level to one factor ({\em main effect}), or it may be due to a combination of multiple assignments ({\em interaction}).
+For example, the assignment of an optical fiber as the type of cable may significantly affect throughput as a main effect, while the combination of assigning TCP as the transport protocol and at the same time using a high number of sockets may significantly affect throughput as an interaction.
+We refer to a factor or interaction as significant when its effects are noticeable over any noise in the system.
+
+Experimentation is crucial to understanding the behavior of complex engineered systems, because analytical approaches are no longer feasible when the system is large.
+But before experiments can be performed, we must determine the factors on which to perform the experimentation.
+This initial step of choosing the significant factors to include in experimentation, and eliminating the insignificant factors, is known as {\em screening}.
+In this work, we explore techniques for screening a large number of system factors, using initial experimentation with locating arrays, to determine the significant factors and interactions.
+Once screening has been performed, further experimentation should be done on the significant factors to determine {\em how} they affect the system.
+Our interest, however, is purely on the initial screening step that finds significant factors.
+
+Similarly to \cite{CMjoco,seidelIWOCA}, we define $k$ system factors $F_1, F_2, \dots, F_k$.
+Each factor $F_j$ has a set $L_j = \{v_{j1}, \dots, v_{j{\ell_j}}\}$ of $\ell_j$ possible levels (values).
+A {\em test} is an assignment of a level from $L_j$ to $F_j$ for each factor.
+For the purpose of conciseness, this work generally omits the factor index when referring to factor levels in assignments, i.e., we use $v_i$ instead of $v_{ji}$.
+A {\em $t$-way interaction} in a test is any collection of $t$ assignments, and is said to have {\em strength} $t$.
+An assignment of $v_{ji}$ to $F_j$ is written as $F_j = v_i$, and a $t$-way interaction is written as the $t$ assignments separated by $t - 1$ ampersands.
+For example, $F_a = v_x$ \& $F_b = v_y$ is a 2-way interaction, and is said to have strength 2.
+A main effect is a single assignment that is simply a 1-way interaction.
+Each test therefore includes ({\em covers}) $k \choose t$ $t$-way interactions.
+An {\em experimental design} of size $n$ is a collection of $n$ tests.
+When running the system, a test results in one or more output response measurements.
+An {\em experiment} consists of running the system for every test in the experimental design.
+Usually, an experiment is represented as an $n \times k$ array, $A$, with tests corresponding to rows and factors corresponding to columns.
+An element in the $i$-th row and $j$-th column contains a level from $L_j$ assigned to $F_j$ in the $i$-th test.
+Following \cite{CMjoco}, for a $t$-way interaction $T$, denote the set of rows (tests) in $A$ where $T$ is covered as $\rho(A,T)$, and for a set $\mathcal{T}$ of interactions, define $\rho(A,\mathcal{T}) = \bigcup_{T \in {\mathcal{T}}} \rho(A,T)$.
+
+Experimental designs used for screening fall into many different categories.
+Full-factorial designs include all possible combinations of levels of each factor \cite{Montgomery-DOE-2017} and cover all $t$-way interactions where $1 \leq t \leq k$.
+The size of a full-factorial design is exponential in the number of factors.
+Fractional-factorial designs contain a fixed fraction of the tests in a full-factorial design and therefore also grow exponentially in the number of factors.
+In general, complex engineered systems involve a large number of factors, making full-factorial and fractional-factorial experimental designs impractical for screening.
+
+Saturated designs include a number of tests equal to one more than the number of factors \cite{Montgomery-DOE-2017}, i.e., $n = k + 1$.
+Saturated designs are helpful when only a small fraction of the system factors are expected to contribute to the response.
+Supersaturated designs employ even fewer tests than saturated designs \cite{Montgomery-DOE-2017}, i.e., $n < k + 1$.
+While they are not widely used, supersaturated designs are potentially useful when very few factors are expected to contribute to the response \cite{Montgomery-DOE-2017}.
+Both saturated and supersaturated designs conveniently involve running a small number of tests, but they only attempt to estimate main effects.
+It may be impossible to estimate the effects of all interactions with these designs because a significant interaction may be missing completely from the design, or it may be indistinguishable from ({\em confounded} with) another interaction.
+These designs often require advanced analysis techniques as well.
+
+Covering arrays of strength $t$ are experimental designs that cover every $t$-way interaction in at least one test \cite{CMjoco}.
+Covering arrays can reveal the presence of an interaction that has a significant impact on the system response, but they do not necessarily identify the specific significant interaction \cite{CMjoco}.
+Suppose a system has $k = 3$ factors, $F_1, F_2, F_3$ and the number of levels are $\ell_1 = 2, \ell_2 = 3, \ell_3 = 3$.
+Table \ref{tab:intro_ca} is a covering array $A$ of strength 2 for this system.
+Define $T_1 = (F_3 = v_3$ \& $F_1 = v_2)$ and $T_2 = (F_3 = v_3$ \& $F_2 = v_2)$.
+Then $\rho(A,T_1) = \{$4$\}$ and $\rho(A,T_2) = \{$4$\}$.
+Suppose that $T_1$ is significant but $T_2$ is insignificant.
+Thus test 4 produces a significantly different response (because of $T_1$) and the covering array reveals the {\em presence} of a significant interaction.
+However, it is impossible to determine, from only the tests in Table \ref{tab:intro_ca}, whether $T_1$ or $T_2$ is significant (or if both are).
+For the purpose of screening, we must determine the factors that are significant, and therefore must determine exactly which interaction is significant.
+
+\begin{table}[htbp]
+\caption{Covering Array - First Example}
+\label{tab:intro_ca}
+\begin{tabularx}{\textwidth}{|1|3|3|3|}
+\hline
+\multicolumn{4}{|c|}{Covering Array $A$} \\
+\hline
+Test & $F_1$ & $F_2$ & $F_3$ \\
+\hline
+ 1 & $v_2$ & $v_3$ & $v_2$ \\
+ 2 & $v_2$ & $v_1$ & $v_1$ \\
+ 3 & $v_1$ & $v_1$ & $v_2$ \\
+ 4 & $v_2$ & $v_2$ & $v_3$ \\
+ 5 & $v_2$ & $v_3$ & $v_1$ \\
+ 6 & $v_1$ & $v_3$ & $v_3$ \\
+ 7 & $v_1$ & $v_2$ & $v_1$ \\
+ 8 & $v_2$ & $v_2$ & $v_2$ \\
+ 9 & $v_1$ & $v_1$ & $v_3$ \\
+\hline
+\end{tabularx}
+\end{table}
+
+This work focuses on using a new experimental design for screening - a {\em locating array} (LA) \cite{CMjoco}.
+As discussed by Colbourn and McClary \cite{CMjoco}, an experimental design is $(d,t)$-{\em locating} if $\rho(A,\mathcal{T}_1) = \rho(A,\mathcal{T}_2) \Leftrightarrow \mathcal{T}_1 = \mathcal{T}_2$ whenever $\mathcal{T}_1, \mathcal{T}_2$ are any sets of $t$-way interactions where  $|\mathcal{T}_1| = d$, and $|\mathcal{T}_2| = d$.
+When $|\mathcal{T}_1| \leq d$ and $|\mathcal{T}_2| \leq d$ and $\mathcal{T}_1, \mathcal{T}_2$ are any sets of interactions with strength at most $t$, the array is $(\overline{d},\overline{t})$-{\em locating}.
+Thus while the covering array in Table \ref{tab:intro_ca} is unable to distinguish between $T_1$ and $T_2$ because $\rho(A,T_1)$ and $\rho(A,T_2)$ are equal, both a $(d,t)$ and $(\overline{d},\overline{t})$-locating array guarantee that $\rho(A,\mathcal{T}_1)$ and $\rho(A,\mathcal{T}_2)$ must be different when $\mathcal{T}_1$ and $\mathcal{T}_2$ are different sets.
+For the purpose of screening, a locating array provides a set of tests to locate any set $\mathcal{T}$ of interactions that significantly affect the response.
+Locating arrays are covering arrays with additional desirable properties, and are especially useful because they grow logarithmically in the number of factors when the number of levels is fixed for all factors \cite{CSmics}.
+
+In this work, we focus on locating arrays where $d = 1$ because we make the assumption that the most significant interaction stands out in the response (more significant than all other significant interactions) and it is not necessary to locate more than one interaction at the same time.
+We also assume that after the most significant interaction is located and its effect is removed from the response, then the second most significant interaction again stands out.
+This assumption of a "heavy-hitters" pattern in the significant interactions has been used with locating arrays \cite{AldacoCS15,Compton-et-al-LA}, and is discussed in more detail in Chapter \ref{chptr:analysis} and tested in Chapter \ref{chptr:robustness}.
+Without this assumption, one needs to examine locating arrays with $d \geq 1$, and this investigation is reserved for future work.
+We also focus on interactions with strength at most 2, and ignore interactions with strength 3 or higher because the sparsity of effects principle indicates that most higher strength interactions are often negligible \cite{Montgomery-DOE-2017,LiXiang2006Ridf}.
+However, much of this work pertaining to interactions of strength 2 can be extended to interactions with higher strength.
+For the remainder of this work, we refer to a 1-way interaction as a {\em main effect} and to a 2-way interaction as simply an {\em interaction}.
+We refer to both main effects and interactions as {\em terms} that can be included in a linear model of a response.
+
+Table \ref{tab:intro_la} is an example of a $(\overline{1},\overline{2})$-locating array for the same system used in Table \ref{tab:intro_ca}, and is constructed by adding 3 extra rows to the covering array $A$ to create a locating array $A'$.
+The 3 extra rows are separated from the others by a horizontal line.
+All further locating arrays discussed in this work are $(\overline{1},\overline{2})$-locating arrays.
+
+\begin{table}[htbp]
+\caption{Locating Array - First Example}
+\label{tab:intro_la}
+\begin{tabularx}{\textwidth}{|1|3|3|3|}
+\hline
+\multicolumn{4}{|c|}{Locating Array $A'$} \\
+\hline
+Test & $F_1$ & $F_2$ & $F_3$ \\
+\hline
+ 1 & $v_2$ & $v_3$ & $v_2$ \\
+ 2 & $v_2$ & $v_1$ & $v_1$ \\
+ 3 & $v_1$ & $v_1$ & $v_2$ \\
+ 4 & $v_2$ & $v_2$ & $v_3$ \\
+ 5 & $v_2$ & $v_3$ & $v_1$ \\
+ 6 & $v_1$ & $v_3$ & $v_3$ \\
+ 7 & $v_1$ & $v_2$ & $v_1$ \\
+ 8 & $v_2$ & $v_2$ & $v_2$ \\
+ 9 & $v_1$ & $v_1$ & $v_3$ \\
+\hline
+10 & $v_1$ & $v_3$ & $v_1$ \\
+11 & $v_2$ & $v_1$ & $v_2$ \\
+12 & $v_1$ & $v_2$ & $v_3$ \\
+\hline
+\end{tabularx}
+\end{table}
+
+Recall $T_1 = (F_3 = v_3$ \& $F_1 = v_2)$ and $T_2 = (F_3 = v_3$ \& $F_2 = v_2)$.
+Now $\rho(A',T_1) = \{$4$\}$ and $\rho(A',T_2) = \{$4,12$\}$.
+The sets of rows where the two interactions are covered is now different because the three additional rows have created a locating array.
+Thus the two interactions are now distinguishable from each other and it is possible to determine which is significant.
+
+Screening using locating arrays involves the following steps.
+First, a locating array is constructed for the possible significant factors.
+Second, the system is executed for every test indicated by the locating array and a response is measured.
+Third, the response is analyzed to determine which factors are significant and which are not.
+The final screening result is the set of significant factors.
+
+This thesis contributes to the screening process in three areas: construction of locating arrays, analysis of the response, and robustness of the analysis.
+Two construction algorithms for locating arrays are discussed in Chapter \ref{chptr:construction}.
+Tables containing locating array sizes for different numbers of factors and levels are also provided in Chapter \ref{chptr:construction}.
+An efficient analysis algorithm that employs linear models to determine the significant factors in the system is discussed in Chapter \ref{chptr:analysis} and its results are validated with previous analysis approaches.
+Because response measurements in real systems include noise, the effects of noise in the screening process and coping strategies are investigated in Chapter \ref{chptr:robustness}.
+Robustness to violation of the "heavy-hitters" assumption is also tested in Chapter  \ref{chptr:robustness}.
+Finally, directions for future work are discussed in Chapter \ref{chptr:conclusion}.
+Some of the work presented in Chapters \ref{chptr:construction} and \ref{chptr:analysis} has been published in \cite{seidelIWOCA} and \cite{seidelCNERT}.

@@ -1,0 +1,650 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.6 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \sortlist[entry]{none/global}
+    \entry{CMjoco}{article}{}
+      \name{author}{2}{}{%
+        {{hash=6a63885eaf8e2c0a8c62f878184f5e6e}{%
+           family={Colbourn},
+           family_i={C\bibinitperiod},
+           given={C.\bibnamedelimi J.},
+           given_i={C\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=bf1aa4b2e78841b58a56a919e29666fc}{%
+           family={McClary},
+           family_i={M\bibinitperiod},
+           given={D.\bibnamedelimi W.},
+           given_i={D\bibinitperiod\bibinitdelim W\bibinitperiod}}}%
+      }
+      \strng{namehash}{28c8f0aa32e6797cd3fba26283a5a07c}
+      \strng{fullhash}{28c8f0aa32e6797cd3fba26283a5a07c}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Combinatorial Optimization}
+      \field{title}{Locating and Detecting Arrays for Interaction Faults}
+      \field{volume}{15}
+      \field{year}{2008}
+      \field{pages}{17\bibrangedash 48}
+      \range{pages}{32}
+    \endentry
+    \entry{seidelIWOCA}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=23caa0659e0a28a7314c32c8ced425fa}{%
+           family={Seidel},
+           family_i={S\bibinitperiod},
+           given={Stephen\bibnamedelima A.},
+           given_i={S\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=7246f1482aa569bb3bed499121dda2f8}{%
+           family={Sarkar},
+           family_i={S\bibinitperiod},
+           given={Kaushik},
+           given_i={K\bibinitperiod}}}%
+        {{hash=641c8ce4ccb4b31a664bd6f988eb791a}{%
+           family={Colbourn},
+           family_i={C\bibinitperiod},
+           given={Charles\bibnamedelima J.},
+           given_i={C\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=c88bc409534607e5bb793783f4a5ebfc}{%
+           family={Syrotiuk},
+           family_i={S\bibinitperiod},
+           given={Violet\bibnamedelima R.},
+           given_i={V\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \name{editor}{3}{}{%
+        {{hash=cff5577159d83b879e6adf46fc20c57b}{%
+           family={Iliopoulos},
+           family_i={I\bibinitperiod},
+           given={Costas},
+           given_i={C\bibinitperiod}}}%
+        {{hash=977cf034766fb9a69dae9284817fa9bb}{%
+           family={Leong},
+           family_i={L\bibinitperiod},
+           given={Hon\bibnamedelima Wai},
+           given_i={H\bibinitperiod\bibinitdelim W\bibinitperiod}}}%
+        {{hash=4536e197bc88bc26375a0b16e86869b9}{%
+           family={Sung},
+           family_i={S\bibinitperiod},
+           given={Wing-Kin},
+           given_i={W\bibinithyphendelim K\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer International Publishing}%
+      }
+      \strng{namehash}{babe8f43e9cb512fc57a4708c2d739ed}
+      \strng{fullhash}{db095fdbb5086dcd8a523b6dd196d09f}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Combinatorial Algorithms [IWOCA 2018], Lecture Notes in Computer Science}
+      \field{title}{Separating Interaction Effects Using Locating and Detecting Arrays}
+      \field{volume}{10979}
+      \field{year}{2018}
+      \field{pages}{349\bibrangedash 360}
+      \range{pages}{12}
+    \endentry
+    \entry{Montgomery-DOE-2017}{book}{}
+      \name{author}{1}{}{%
+        {{hash=473ca63b37747389b33a6e2fe22ebb72}{%
+           family={Montgomery},
+           family_i={M\bibinitperiod},
+           given={D.\bibnamedelimi C.},
+           given_i={D\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+      }
+      \list{publisher}{2}{%
+        {John Wiley}%
+        {Sons, Inc.}%
+      }
+      \strng{namehash}{473ca63b37747389b33a6e2fe22ebb72}
+      \strng{fullhash}{473ca63b37747389b33a6e2fe22ebb72}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{edition}{9th}
+      \field{title}{Design and Analysis of Experiments}
+      \field{year}{2017}
+    \endentry
+    \entry{CSmics}{article}{}
+      \name{author}{2}{}{%
+        {{hash=6a63885eaf8e2c0a8c62f878184f5e6e}{%
+           family={Colbourn},
+           family_i={C\bibinitperiod},
+           given={C.\bibnamedelimi J.},
+           given_i={C\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=5b2c5cbae6a6fde33283f7beac4f073a}{%
+           family={Syrotiuk},
+           family_i={S\bibinitperiod},
+           given={V.\bibnamedelimi R.},
+           given_i={V\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{dadc54204f0dabd8dc439ea18805e1ea}
+      \strng{fullhash}{dadc54204f0dabd8dc439ea18805e1ea}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Mathematics in Computer Science}
+      \field{month}{12}
+      \field{number}{4}
+      \field{title}{On a Combinatorial Framework for Fault Characterization}
+      \field{volume}{12}
+      \field{year}{2018}
+      \field{pages}{429\bibrangedash 451}
+      \range{pages}{23}
+    \endentry
+    \entry{AldacoCS15}{article}{}
+      \name{author}{3}{}{%
+        {{hash=6a08d53960894c72bc772256d8d61385}{%
+           family={Aldaco},
+           family_i={A\bibinitperiod},
+           given={A.\bibnamedelimi N.},
+           given_i={A\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+        {{hash=6a63885eaf8e2c0a8c62f878184f5e6e}{%
+           family={Colbourn},
+           family_i={C\bibinitperiod},
+           given={C.\bibnamedelimi J.},
+           given_i={C\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=5b2c5cbae6a6fde33283f7beac4f073a}{%
+           family={Syrotiuk},
+           family_i={S\bibinitperiod},
+           given={V.\bibnamedelimi R.},
+           given_i={V\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{bb0d8ebcbb3172e16d7f9d1937b3ce87}
+      \strng{fullhash}{bb0d8ebcbb3172e16d7f9d1937b3ce87}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{SIGOPS Operating Systems Review}
+      \field{month}{01}
+      \field{number}{1}
+      \field{title}{Locating Arrays: A New Experimental Design for Screening Complex Engineered Systems}
+      \field{volume}{49}
+      \field{year}{2015}
+      \field{pages}{31\bibrangedash 40}
+      \range{pages}{10}
+    \endentry
+    \entry{Compton-et-al-LA}{article}{}
+      \name{author}{5}{}{%
+        {{hash=6a63885eaf8e2c0a8c62f878184f5e6e}{%
+           family={Colbourn},
+           family_i={C\bibinitperiod},
+           given={C.\bibnamedelimi J.},
+           given_i={C\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=eaf25f84cef480eedc90a261460cae1f}{%
+           family={{De\bibnamedelimb Poorter}},
+           family_i={D\bibinitperiod},
+           given={E.},
+           given_i={E\bibinitperiod}}}%
+        {{hash=a40143cf49c1cc1f97e5cd99e748d8ca}{%
+           family={Mehari},
+           family_i={M\bibinitperiod},
+           given={M.\bibnamedelimi T.},
+           given_i={M\bibinitperiod\bibinitdelim T\bibinitperiod}}}%
+        {{hash=e229d4b34849f91822ce456d20c59dd3}{%
+           family={Moerman},
+           family_i={M\bibinitperiod},
+           given={Ingrid},
+           given_i={I\bibinitperiod}}}%
+        {{hash=5b2c5cbae6a6fde33283f7beac4f073a}{%
+           family={Syrotiuk},
+           family_i={S\bibinitperiod},
+           given={V.\bibnamedelimi R.},
+           given_i={V\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{bc98d75549ab2cda403b243b664ddf93}
+      \strng{fullhash}{b893bb57bc974779efc7ade76b2536d8}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Submitted for publication}
+      \field{title}{An Efficient Screening Method for Identifying Parameters and Interactions that Impact Wireless Network Performance}
+    \endentry
+    \entry{LiXiang2006Ridf}{article}{}
+      \name{author}{3}{}{%
+        {{hash=09e1a64c667557dd7866bc4e66d193ce}{%
+           family={Li},
+           family_i={L\bibinitperiod},
+           given={Xiang},
+           given_i={X\bibinitperiod}}}%
+        {{hash=bbdac31436bb15c642a939e130faa959}{%
+           family={Sudarsanam},
+           family_i={S\bibinitperiod},
+           given={Nandan},
+           given_i={N\bibinitperiod}}}%
+        {{hash=c1b7f3f6e0e3a66aa4a05fd1c2e079bd}{%
+           family={Frey},
+           family_i={F\bibinitperiod},
+           given={Daniel\bibnamedelima D.},
+           given_i={D\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+      }
+      \strng{namehash}{fd9dd1fd54a3e083234a948549019a18}
+      \strng{fullhash}{fd9dd1fd54a3e083234a948549019a18}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Complexity}
+      \field{number}{5}
+      \field{title}{Regularities in data from factorial experiments}
+      \field{volume}{11}
+      \field{year}{2006}
+      \field{pages}{32\bibrangedash 45}
+      \range{pages}{14}
+    \endentry
+    \entry{seidelCNERT}{inproceedings}{}
+      \name{author}{6}{}{%
+        {{hash=27d7e5c667b40c7c8299b1a4669d273b}{%
+           family={Seidel},
+           family_i={S\bibinitperiod},
+           given={S.\bibnamedelimi A.},
+           given_i={S\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=a40143cf49c1cc1f97e5cd99e748d8ca}{%
+           family={Mehari},
+           family_i={M\bibinitperiod},
+           given={M.\bibnamedelimi T.},
+           given_i={M\bibinitperiod\bibinitdelim T\bibinitperiod}}}%
+        {{hash=6a63885eaf8e2c0a8c62f878184f5e6e}{%
+           family={Colbourn},
+           family_i={C\bibinitperiod},
+           given={C.\bibnamedelimi J.},
+           given_i={C\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=eaf25f84cef480eedc90a261460cae1f}{%
+           family={{De\bibnamedelimb Poorter}},
+           family_i={D\bibinitperiod},
+           given={E.},
+           given_i={E\bibinitperiod}}}%
+        {{hash=68482360c195f02f95ea8b809685724c}{%
+           family={Moorman},
+           family_i={M\bibinitperiod},
+           given={I.},
+           given_i={I\bibinitperiod}}}%
+        {{hash=5b2c5cbae6a6fde33283f7beac4f073a}{%
+           family={Syrotiuk},
+           family_i={S\bibinitperiod},
+           given={V.\bibnamedelimi R.},
+           given_i={V\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{56d6b04bcb284e3639b3da61c3d86297}
+      \strng{fullhash}{9e39b6f42fd8d6c94607de7334ff0079}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{IEEE INFOCOM International Workshop on Computer and Networking Experimental Research Using Testbeds (CNERT)}
+      \field{title}{Analysis of large-scale experimental data from wireless networks}
+      \field{year}{2018}
+    \endentry
+    \entry{Stein74}{article}{}
+      \name{author}{1}{}{%
+        {{hash=7aecf0f11b5d930375910bdc5bf3f965}{%
+           family={Stein},
+           family_i={S\bibinitperiod},
+           given={S.\bibnamedelimi K.},
+           given_i={S\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+      }
+      \strng{namehash}{7aecf0f11b5d930375910bdc5bf3f965}
+      \strng{fullhash}{7aecf0f11b5d930375910bdc5bf3f965}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{0097-3165}
+      \field{journaltitle}{Journal of Combinatorial Theory, Series A}
+      \field{number}{3}
+      \field{title}{Two combinatorial covering theorems}
+      \field{volume}{16}
+      \field{year}{1974}
+      \field{pages}{391\bibrangedash 397}
+      \range{pages}{7}
+    \endentry
+    \entry{Lovasz75}{article}{}
+      \name{author}{1}{}{%
+        {{hash=0007443266e105fbe07a83b4e76993fa}{%
+           family={Lovász},
+           family_i={L\bibinitperiod},
+           given={L.},
+           given_i={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{0007443266e105fbe07a83b4e76993fa}
+      \strng{fullhash}{0007443266e105fbe07a83b4e76993fa}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{0012-365X}
+      \field{journaltitle}{Discrete Mathematics}
+      \field{number}{4}
+      \field{title}{On the ratio of optimal integral and fractional covers}
+      \field{volume}{13}
+      \field{year}{1975}
+      \field{pages}{383\bibrangedash 390}
+      \range{pages}{8}
+    \endentry
+    \entry{Johnson74}{article}{}
+      \name{author}{1}{}{%
+        {{hash=8c7f2a207a19e41869867861822a3f38}{%
+           family={Johnson},
+           family_i={J\bibinitperiod},
+           given={D.\bibnamedelimi S.},
+           given_i={D\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+      }
+      \strng{namehash}{8c7f2a207a19e41869867861822a3f38}
+      \strng{fullhash}{8c7f2a207a19e41869867861822a3f38}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Computer and System Sciences}
+      \field{number}{3}
+      \field{title}{Approximation algorithms for combinatorial problems}
+      \field{volume}{9}
+      \field{year}{1974}
+      \field{pages}{256\bibrangedash 278}
+      \range{pages}{23}
+    \endentry
+    \entry{LovaszLocalLemma}{article}{}
+      \name{author}{2}{}{%
+        {{hash=731f652a1aa2e8b4d8dd88796de84778}{%
+           family={Erdős},
+           family_i={E\bibinitperiod},
+           given={P.},
+           given_i={P\bibinitperiod}}}%
+        {{hash=0007443266e105fbe07a83b4e76993fa}{%
+           family={Lovász},
+           family_i={L\bibinitperiod},
+           given={L.},
+           given_i={L\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {North-Holland, Amsterdam}%
+      }
+      \strng{namehash}{c391575809a6d65f11b573ab79a31708}
+      \strng{fullhash}{c391575809a6d65f11b573ab79a31708}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Infinite and finite sets ({C}olloq., {K}eszthely, 1973 {V}ol. {II}, pp. 609--627. Colloq. Math. Soc. János Bolyai)}
+      \field{title}{Problems and results on {$3$}-chromatic hypergraphs and some related questions}
+      \field{volume}{10}
+      \field{year}{1975}
+      \field{pages}{609\bibrangedash 627}
+      \range{pages}{19}
+    \endentry
+    \entry{Sarkar}{thesis}{}
+      \name{author}{1}{}{%
+        {{hash=7246f1482aa569bb3bed499121dda2f8}{%
+           family={Sarkar},
+           family_i={S\bibinitperiod},
+           given={Kaushik},
+           given_i={K\bibinitperiod}}}%
+      }
+      \list{institution}{1}{%
+        {Arizona State University}%
+      }
+      \strng{namehash}{7246f1482aa569bb3bed499121dda2f8}
+      \strng{fullhash}{7246f1482aa569bb3bed499121dda2f8}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Covering Arrays: Algorithms and Asymptotics}
+      \field{type}{phdthesis}
+      \field{year}{2016}
+    \endentry
+    \entry{moser10}{article}{}
+      \name{author}{2}{}{%
+        {{hash=8c9bd374e30c7613b6a878461f9bfc3f}{%
+           family={Moser},
+           family_i={M\bibinitperiod},
+           given={Robin\bibnamedelima A.},
+           given_i={R\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=a20f49fbb356059ee203950b7aebbfe4}{%
+           family={Tardos},
+           family_i={T\bibinitperiod},
+           given={Gábor},
+           given_i={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{4bc75da953190816b04086ceb841eb2e}
+      \strng{fullhash}{4bc75da953190816b04086ceb841eb2e}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{J. ACM}
+      \field{number}{2}
+      \field{title}{A constructive proof of the general {L}ovász local lemma}
+      \field{volume}{57}
+      \field{year}{2010}
+      \field{pages}{Art. 11\bibrangessep 15}
+      \range{pages}{-1}
+    \endentry
+    \entry{SIS}{article}{}
+      \name{author}{3}{}{%
+        {{hash=d03aaf39215ee0b797bab3b2dfb014a2}{%
+           family={Liu},
+           family_i={L\bibinitperiod},
+           given={J.\bibnamedelimi Y.},
+           given_i={J\bibinitperiod\bibinitdelim Y\bibinitperiod}}}%
+        {{hash=1de96e1d639296e38813b49c53bca321}{%
+           family={Zhong},
+           family_i={Z\bibinitperiod},
+           given={W.},
+           given_i={W\bibinitperiod}}}%
+        {{hash=b4c99d6eec8e66ffbeb1a8d0baa2dd71}{%
+           family={Li},
+           family_i={L\bibinitperiod},
+           given={R.\bibnamedelimi Z.},
+           given_i={R\bibinitperiod\bibinitdelim Z\bibinitperiod}}}%
+      }
+      \strng{namehash}{b47763e76d44494b0c788e78fab57658}
+      \strng{fullhash}{b47763e76d44494b0c788e78fab57658}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Science China Mathematics}
+      \field{title}{A selective overview of feature screening for ultrahigh-dimensional data}
+      \field{volume}{58}
+      \field{year}{2015}
+      \field{pages}{2033\bibrangedash 2054}
+      \range{pages}{22}
+    \endentry
+    \entry{IterativeSIS}{article}{}
+      \name{author}{2}{}{%
+        {{hash=2eb00838f3cea970c7377bfea9631787}{%
+           family={Fan},
+           family_i={F\bibinitperiod},
+           given={Jianqing},
+           given_i={J\bibinitperiod}}}%
+        {{hash=0f66fa2ea251428c6943aaa92cd79812}{%
+           family={Lv},
+           family_i={L\bibinitperiod},
+           given={Jinchi},
+           given_i={J\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Blackwell Publishing Ltd}%
+      }
+      \strng{namehash}{60671466ab8d27e172424ab903a1317b}
+      \strng{fullhash}{60671466ab8d27e172424ab903a1317b}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of the Royal Statistical Society: Series B (Statistical Methodology)}
+      \field{number}{5}
+      \field{title}{Sure independence screening for ultrahigh dimensional feature space}
+      \field{volume}{70}
+      \field{year}{2008}
+      \field{pages}{849\bibrangedash 911}
+      \range{pages}{63}
+    \endentry
+    \entry{Fay2010}{article}{}
+      \name{author}{2}{}{%
+        {{hash=b9a8e8d683a4b88da6309cb66e95e45c}{%
+           family={Fay},
+           family_i={F\bibinitperiod},
+           given={M.},
+           given_i={M\bibinitperiod}}}%
+        {{hash=c32c48a4b76589b6a424e7d8289ea1cc}{%
+           family={Proschan},
+           family_i={P\bibinitperiod},
+           given={M.},
+           given_i={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{06e3ffb338a06b65649cfd24ad1798f2}
+      \strng{fullhash}{06e3ffb338a06b65649cfd24ad1798f2}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Statistics Surveys}
+      \field{title}{Wilcoxon-{M}ann-{W}hitney or t-test? On assumptions for hypothesis tests and multiple interpretations of decision rules}
+      \field{volume}{4}
+      \field{year}{2010}
+      \field{pages}{1\bibrangedash 39}
+      \range{pages}{39}
+    \endentry
+    \entry{Mann1947}{article}{}
+      \name{author}{2}{}{%
+        {{hash=f85d308e7cb5ba0a5cbe15b0049387b6}{%
+           family={Mann},
+           family_i={M\bibinitperiod},
+           given={Henry\bibnamedelima B},
+           given_i={H\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=0e4eb9f68a32954018560c7d572b11b6}{%
+           family={Whitney},
+           family_i={W\bibinitperiod},
+           given={Donald\bibnamedelima R},
+           given_i={D\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{fc77584ace2bfd0347d70e7d6d7490db}
+      \strng{fullhash}{fc77584ace2bfd0347d70e7d6d7490db}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Annals of Mathematical Statistics}
+      \field{number}{1}
+      \field{title}{On a test of whether one of two random variables is stochastically larger than the other}
+      \field{volume}{18}
+      \field{year}{1947}
+      \field{pages}{50\bibrangedash 60}
+      \range{pages}{11}
+    \endentry
+    \entry{Wilcoxon1945}{article}{}
+      \name{author}{1}{}{%
+        {{hash=405b308b1e8e33ef3275bf6cb9c9b281}{%
+           family={Wilcoxon},
+           family_i={W\bibinitperiod},
+           given={Frank},
+           given_i={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{405b308b1e8e33ef3275bf6cb9c9b281}
+      \strng{fullhash}{405b308b1e8e33ef3275bf6cb9c9b281}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Biometrics Bulletin}
+      \field{month}{12}
+      \field{number}{6}
+      \field{title}{Individual Comparisons by Ranking Methods}
+      \field{volume}{1}
+      \field{year}{1945}
+      \field{pages}{80\bibrangedash 83}
+      \range{pages}{4}
+    \endentry
+    \entry{Akaike1974}{article}{}
+      \name{author}{1}{}{%
+        {{hash=926ba39bebf207bb661b158164603311}{%
+           family={Akaike},
+           family_i={A\bibinitperiod},
+           given={H.},
+           given_i={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{926ba39bebf207bb661b158164603311}
+      \strng{fullhash}{926ba39bebf207bb661b158164603311}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Automatic Control}
+      \field{month}{12}
+      \field{number}{6}
+      \field{title}{A new look at the statistical model identification}
+      \field{volume}{19}
+      \field{year}{1974}
+      \field{pages}{716\bibrangedash 723}
+      \range{pages}{8}
+    \endentry
+    \entry{mehari2017}{inproceedings}{}
+      \name{author}{4}{}{%
+        {{hash=23eb1e30b36fb61a5790154e97992238}{%
+           family={Mehari},
+           family_i={M\bibinitperiod},
+           given={Michael},
+           given_i={M\bibinitperiod}}}%
+        {{hash=70acd6bfd2f0e181aacb6b29b809eb4f}{%
+           family={Shahid},
+           family_i={S\bibinitperiod},
+           given={Adnan},
+           given_i={A\bibinitperiod}}}%
+        {{hash=e229d4b34849f91822ce456d20c59dd3}{%
+           family={Moerman},
+           family_i={M\bibinitperiod},
+           given={Ingrid},
+           given_i={I\bibinitperiod}}}%
+        {{hash=846bce69a30ab86eef96e39af27bce79}{%
+           family={{De\bibnamedelimb Poorter}},
+           family_i={D\bibinitperiod},
+           given={Eli},
+           given_i={E\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Delft, Netherlands}%
+      }
+      \list{publisher}{1}{%
+        {ACM}%
+      }
+      \strng{namehash}{9560d201696a35c1c06fc87ef38e6000}
+      \strng{fullhash}{fc04abd374d771886f725c859b1da1f8}
+      \field{sortinit}{0}
+      \field{sortinithash}{990108227b3316c02842d895999a0165}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 15th ACM Conference on Embedded Network Sensor Systems}
+      \field{series}{SenSys '17}
+      \field{title}{Demo Abstract: An Intuitive Drag and Drop Framework for Wireless Network Experimentation}
+      \field{year}{2017}
+      \verb{doi}
+      \verb 10.1145/3131672.3136971
+      \endverb
+    \endentry
+  \endsortlist
+\endrefsection
+\endinput
+

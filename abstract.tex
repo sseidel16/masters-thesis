@@ -1,0 +1,22 @@
+Modern computer systems are complex engineered systems involving a large collection of individual parts, each with many parameters, or factors, affecting system performance.
+One way to understand these complex systems and their performance is through experimentation.
+However, most modern computer systems involve such a large number of factors that thorough experimentation on all of them is impossible.
+An initial screening step is thus necessary to determine which factors are relevant to the system's performance and which factors can be eliminated from experimentation.
+
+Factors may impact system performance in different ways.
+A factor at a specific level may significantly affect performance as a main effect, or in combination with other main effects as an interaction.
+For screening, it is necessary both to identify the presence of these effects and to locate the factors responsible for them.
+A locating array is a relatively new experimental design that causes every main effect and interaction to occur and distinguishes all sets of $d$ main effects and interactions from each other in the tests where they occur.
+This design is therefore helpful in screening complex systems.
+
+The process of screening using locating arrays involves multiple steps.
+First, a locating array is constructed for all possibly significant factors.
+Next, the system is executed for all tests indicated by the locating array and a response is observed.
+Finally, the response is analyzed to identify the significant system factors for future experimentation.
+However, simply constructing a reasonably sized locating array for a large system is no easy task and analyzing the response of the tests presents additional difficulties due to the large number of possible predictors and the inherent imbalance in the experimental design itself.
+Further complications can arise from noise in the system or errors in testing.
+
+This thesis has three contributions.
+First, it provides an algorithm to construct locating arrays using the Lov{\'a}sz Local Lemma with Moser-Tardos resampling.
+Second, it gives an algorithm to analyze the system response efficiently.
+Finally, it studies the robustness of the analysis to the heavy-hitters assumption underlying the approach as well as to varying amounts of system noise.

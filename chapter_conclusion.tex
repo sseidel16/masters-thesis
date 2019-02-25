@@ -1,0 +1,66 @@
+\chapter{Conclusion} \label{chptr:conclusion}
+
+This thesis began by introducing locating arrays and providing motivation for their use in the screening process.
+It showed how covering arrays are useful in determining the presence of a significant $t$-way interaction, but that coverage is not enough.
+Screening requires that significant $t$-way interactions be distinguished from each other so that the relevant system factors may be identified.
+Locating arrays are therefore a natural solution for the screening process.
+Next, this thesis discussed construction of locating arrays, analysis strategies, and robustness.
+
+However, throughout this thesis, we only examined locating arrays with $d = 1$ because of a "heavy-hitters" assumption.
+However, one cannot be sure that the effects of all $t$-way interactions always follow this pattern.
+We therefore leave it for  future work to examine locating arrays with $d \geq 1$ to cope with terms that do not conform to the "heavy-hitters" pattern.
+
+We also assumed in this thesis that interactions of strength greater than 2 are not significant.
+But there are certainly situations where interactions of strength 3 or higher significantly affect the response.
+In this case, the work in this thesis may seek to estimate these effects with main effects and 2-way interactions likely leading to false screening results.
+We leave it for future work to examine locating arrays with interactions of strength greater than 2.
+
+Following the introduction of locating arrays, this thesis discussed construction approaches for locating arrays.
+Building on related work, this work showed that locating arrays can be created using the Lov{\'a}sz Local Lemma with Moser-Tardos resampling, and that the construction process can be accelerated by using a scoring procedure for the array.
+Furthermore, Moser-Tardos resampling can be used to construct locating arrays that have additional constraints including separation $\delta$.
+
+Next, a new analysis approach for locating arrays was presented in Algorithm \ref{alg:bfs_analysis}.
+We build on iterative SIS and OMP in related work to create an algorithm that is both useful and easy to implement.
+However, several aspects of our analysis algorithm should be investigated in future work.
+Our analysis approach in Algorithm \ref{alg:bfs_analysis} always keeps the same number of models, $\mathit{nModels}$, in its queues, and always explores the same number of alternatives, $\mathit{nNewModels}$.
+But there may be certain iterations where it is better to explore more options because of high uncertainty and other iterations where this is not required because of high certainty.
+Ultimately, while there may be benefits to keeping these as constant parameters to the algorithm, one might instead want to vary these parameters dynamically.
+Furthermore, one might also want the parameter $nTerms$ to be chosen automatically to correct possible overfitting issues with analysis.
+This might be done by setting a threshold for $R^2$, or the analysis might be updated to stop adding terms when $R^2$ does not improve significantly.
+Yet another possibility is to track the occurrence counts as more terms are added and stop adding terms based on the drop-off in the factor rankings.
+This work does not explore these possibilities but leaves them for future work.
+
+One important aspect of locating arrays affecting analysis is their imbalance.
+Although all main effects and interactions (up to strength $t$) are covered in a $(\overline{d},\overline{t})$-locating array, some terms are covered much more than others.
+Analysis strategies for locating arrays should not be biased towards terms that are covered more often than others.
+However, OMP uses a dot product that treats all tests equally and ignores the imbalance that is inherent to locating arrays.
+Suppose a locating array $A$ contains hundreds of tests but a particular interaction $T_1$ is covered in exactly one test.
+If $T_1$ is relevant to the system under test, then it is likely that OMP, which treats all tests equally, will be biased towards terms that affect the response in several tests and $T_1$ will experience discrimination.
+There also exist limitations with using $R^2$ to measure the goodness of models.
+All tests are again treated equally when calculating $R^2$, and thus it is likely that the effects of $T_1$ are ignored with little change to $R^2$.
+
+One possible solution might be to weight the tests of a locating array based on the percentage of coverage for a particular interaction that each test accounts for.
+Yet each test involves many interactions that are each covered differently leading to more challenges.
+To complicate matters even further, system noise affects all tests equally, and placing a higher weight on a particular test will exacerbate noise in that test.
+In \cite{AldacoCS15}, strategies are employed to specifically cope with imbalance in the locating array.
+Interestingly, this thesis produces nearly identical results for the same screening experiment in \cite{AldacoCS15} even though we do not consider imbalance.
+It may be interesting to investigate why these approaches that are quite different produce the same results, and if there are other experiments where the approaches might produce different results.
+We leave this difficult issue of balance and unfair bias of tests to future work.
+
+Algorithm \ref{alg:bfs_analysis} analyzes the locating array response and generates a list of $nModels$ best models.
+But screening must indicate what factors are significant to include in experimentation.
+This thesis determines the significant factors by counting the occurrences of each factor in the list of best models generated by the analysis algorithm.
+Although counting occurrences of factors might be simple, this approach may not be the best way to determine significance.
+For example, a factor appearing in a main effect with a large coefficient is likely more significant than a factor appearing in a main effect with a small coefficient.
+A factor is also likely more important when it appears in a main effect than when it appears in an interaction.
+And the significance of a factor likely also depends on the goodness of the model it appears in (the $R^2$ of the model).
+However, this thesis ignores coefficients and model goodness when counting factor occurrences.
+A factor appearing in an interaction is also counted exactly the same as when it appears in a main effect.
+However, we leave it for future work to examine and resolve these issues.
+
+Finally, this thesis discussed robustness of our screening approach using locating arrays.
+We discussed negative effects that may occur when the "heavy-hitters" assumption is not satisfied.
+Scenarios were provided with systems satisfying the "heavy-hitters" assumption to varying degrees.
+Furthermore, artificial noise was introduced in several scenarios and the results were compared to the same scenarios but without noise.
+We showed how separation can help fight against the effects of noise.
+Scenarios were also given showing systems that included a large number of terms, and these terms obscuring each other's effects.

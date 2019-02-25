@@ -1,0 +1,50 @@
+digraph {
+    N00[label=<0<BR/>r<SUP>2</SUP>=0.00>];
+	N01[label=<1<BR/>r<SUP>2</SUP>=0.74>];
+	N02[label=<2<BR/>r<SUP>2</SUP>=0.58>];
+	N03[label=<3<BR/>r<SUP>2</SUP>=0.58>];
+	N04[label=<4<BR/>r<SUP>2</SUP>=0.97>];
+	N05[label=<5<BR/>r<SUP>2</SUP>=0.86>];
+	N06[label=<6<BR/>r<SUP>2</SUP>=0.86>];
+	N07[label=<7<BR/>r<SUP>2</SUP>=0.97>];
+	N08[label=<8<BR/>r<SUP>2</SUP>=0.97>];
+	N09[label=<9<BR/>r<SUP>2</SUP>=0.86>];
+	N10[label=<10<BR/>r<SUP>2</SUP>=0.97>];
+	N11[label=<11<BR/>r<SUP>2</SUP>=0.97>];
+	N12[label=<12<BR/>r<SUP>2</SUP>=0.86>];
+	N13[label=<13<BR/>r<SUP>2</SUP>=0.99>];
+	N14[label=<14<BR/>r<SUP>2</SUP>=0.98>];
+	N15[label=<15<BR/>r<SUP>2</SUP>=0.98>];
+	N16[label=<16<BR/>r<SUP>2</SUP>=1.00>];
+	N17[label=<17<BR/>r<SUP>2</SUP>=0.98>];
+	N18[label=<18<BR/>r<SUP>2</SUP>=0.98>];
+	N19[label=<19<BR/>r<SUP>2</SUP>=1.00>];
+	N20[label=<20<BR/>r<SUP>2</SUP>=0.98>];
+	N21[label=<21<BR/>r<SUP>2</SUP>=0.98>];
+
+    subgraph Rel1 {
+        edge [dir=none]
+        N00 -> N01 [label=<F<SUB>2</SUB>=v<SUB>2</SUB>&amp;F<SUB>3</SUB>=v<SUB>2</SUB>>]
+		N00 -> N02 [label=<F<SUB>2</SUB>=v<SUB>1</SUB>>]
+		N00 -> N03 [label=<F<SUB>2</SUB>=v<SUB>2</SUB>>]
+		N01 -> N04 [label=<F<SUB>2</SUB>=v<SUB>1</SUB>&amp;F<SUB>3</SUB>=v<SUB>1</SUB>>]
+		N01 -> N05 [label=<F<SUB>2</SUB>=v<SUB>2</SUB>&amp;F<SUB>3</SUB>=v<SUB>1</SUB>>]
+		N01 -> N06 [label=<F<SUB>2</SUB>=v<SUB>1</SUB>>]
+		N02 -> N07 [label=<F<SUB>3</SUB>=v<SUB>1</SUB>>]
+		N02 -> N08 [label=<F<SUB>3</SUB>=v<SUB>2</SUB>>]
+		N02 -> N09 [label=<F<SUB>2</SUB>=v<SUB>2</SUB>&amp;F<SUB>3</SUB>=v<SUB>1</SUB>>]
+		N03 -> N10 [label=<F<SUB>3</SUB>=v<SUB>1</SUB>>]
+		N03 -> N11 [label=<F<SUB>3</SUB>=v<SUB>2</SUB>>]
+		N03 -> N12 [label=<F<SUB>2</SUB>=v<SUB>2</SUB>&amp;F<SUB>3</SUB>=v<SUB>1</SUB>>]
+		N04 -> N13 [label=<F<SUB>1</SUB>=v<SUB>1</SUB>&amp;F<SUB>3</SUB>=v<SUB>2</SUB>>]
+		N04 -> N14 [label=<F<SUB>1</SUB>=v<SUB>1</SUB>>]
+		N04 -> N15 [label=<F<SUB>1</SUB>=v<SUB>2</SUB>>]
+		N07 -> N16 [label=<F<SUB>1</SUB>=v<SUB>2</SUB>&amp;F<SUB>3</SUB>=v<SUB>2</SUB>>]
+		N07 -> N17 [label=<F<SUB>1</SUB>=v<SUB>1</SUB>>]
+		N07 -> N18 [label=<F<SUB>1</SUB>=v<SUB>2</SUB>>]
+		N08 -> N19 [label=<F<SUB>1</SUB>=v<SUB>2</SUB>&amp;F<SUB>3</SUB>=v<SUB>2</SUB>>]
+		N08 -> N20 [label=<F<SUB>1</SUB>=v<SUB>1</SUB>>]
+		N08 -> N21 [label=<F<SUB>1</SUB>=v<SUB>2</SUB>>]
+    }
+
+}

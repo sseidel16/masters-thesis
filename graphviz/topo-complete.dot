@@ -1,0 +1,22 @@
+digraph {
+    zotacK1; zotacK2; zotacK3; zotacK4
+
+    subgraph Rel1 {
+        edge [dir=none]
+        zotacK1 -> zotacK2
+        zotacK1 -> zotacK3
+        zotacK1 -> zotacK4
+        zotacK2 -> zotacK3
+        zotacK2 -> zotacK4
+        zotacK3 -> zotacK4
+    }
+
+    subgraph Rel2 {
+        edge [color=blue]
+
+        zotacK1 -> zotacK2
+        zotacK2 -> zotacK3
+        zotacK3 -> zotacK4
+        zotacK4 -> zotacK1
+    }
+}

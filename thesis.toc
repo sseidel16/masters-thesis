@@ -1,0 +1,72 @@
+\changetocdepth {5}
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\setlength {\cftchapterindent }{0em}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{List of Tables}{vii}{section*.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{List of Figures}{x}{section*.5}
+\defcounter {refsection}{0}\relax 
+\setlength {\cftchapterindent }{\levelindentincrement }
+\defcounter {refsection}{0}\relax 
+\contentsline {part}{Chapter}{x}{section*.7}
+\defcounter {refsection}{0}\relax 
+\markboth {CHAPTER}{Page}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {1}Introduction}{1}{chapter.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {2}Related Work}{8}{chapter.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.1}Construction Work}{8}{section.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.2}Analysis Work}{10}{section.2.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.1}Orthogonal Matching Pursuit}{13}{subsection.2.2.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {2.2.2}Statistical Approach}{14}{subsection.2.2.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {2.3}Summary}{14}{section.2.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {3}Construction}{16}{chapter.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.1}Desirable Properties}{16}{section.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.2}Initial Greedy Approach}{20}{section.3.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.3}Randomized Approaches}{25}{section.3.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3.1}Moser-Tardos Resampling}{31}{subsection.3.3.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {3.3.2}Directed Moser-Tardos Resampling}{33}{subsection.3.3.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {3.4}Summary}{37}{section.3.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {4}Analysis}{39}{chapter.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.1}Analysis Motivation}{40}{section.4.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.2}Introducing a New Approach}{40}{section.4.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.3}Counting Occurrences}{43}{section.4.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.4}Validation}{44}{section.4.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.5}Summary}{48}{section.4.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {5}Robustness}{51}{chapter.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.1}\csqQQ {34}Heavy-Hitters\csqQQ {34} Requirement}{51}{section.5.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.2}Effects of Noise}{59}{section.5.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.3}Separation to Cope with Noise}{67}{section.5.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.4}Systems Involving a Large Number of Terms}{75}{section.5.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {5.5}Summary}{84}{section.5.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\chapternumberline {6}Conclusion}{86}{chapter.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\hspace {-\cftchapterindent }References}{90}{section*.10}
+\defcounter {refsection}{0}\relax 
+\setcounter {tocdepth}{0}

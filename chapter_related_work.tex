@@ -1,0 +1,171 @@
+\chapter{Related Work} \label{chptr:related}
+
+This chapter investigates other work related to the construction of locating arrays and analysis of their response.
+Randomized approaches for construction of covering and locating arrays are introduced in Section \ref{sect:rel_construction}, while relevant approaches for response analysis, including two approaches designed exclusively for locating arrays, are discussed in Section \ref{sect:rel_analysis}.
+
+\section{Construction Work} \label{sect:rel_construction}
+
+General construction strategies for locating arrays are found in \cite{CSmics}.
+These strategies include using the Stein-Lov\'asz-Johnson framework and using the Lov{\'a}sz Local Lemma with Moser-Tardos resampling.
+In \cite{CSmics}, the requirements for a locating array are presented as events that can be either {\em good} or {\em bad}.
+Good events are requirements that are satisfied and bad events are requirements that are violated.
+A collection of tests is a locating array when no bad events occur.
+The events are classified and further divided into patterns, and then the probability of a pattern being good is calculated for each pattern \cite{CSmics}.
+One can then determine the expected number of bad events when $n$ tests are randomly chosen, and a locating array with no bad events is guaranteed to exist when this expectation is less than one \cite{CSmics}.
+Graphs in \cite{CSmics} give the necessary locating array sizes for the expectation of bad events to be less than one for different numbers of columns in the array.
+
+Following \cite{seidelIWOCA}, the Stein-Lov\'asz-Johnson framework \cite{Stein74,Lovasz75,Johnson74} indicates that a test (row) be added that reduces the number of bad events by at least the reduction that would be expected from a test chosen randomly from all possible tests.
+A locating array can thus be constructed by selecting one row at a time and ensuring at each selection that the number of bad events in the array does not exceed the expected number of bad events for a random array of the same size \cite{CSmics}.
+Graphs in \cite{CSmics} provide bounds on locating array sizes for the row-at-a-time approach for different numbers of columns in the array.
+These graphs also show that locating array sizes grow logarithmically in the number of factors when the number of levels is fixed for all factors.
+
+The Lov{\'a}sz Local Lemma \cite{LovaszLocalLemma} is used in \cite{Sarkar} for the construction of covering arrays with Moser-Tardos resampling \cite{moser10} and can be applied to the construction of locating arrays as well \cite{CSmics}.
+The construction process is also modeled as avoiding {\em bad} events (situations where the array is not a valid covering or locating array) \cite{Sarkar} and these events depend on the columns of the array.
+Moser-Tardos resampling indicates that when the sufficient condition for the Lov{\'a}sz Local Lemma is satisfied, then a solution can be found (where no bad events occur) with a randomized polynomial time algorithm \cite{moser10}.
+
+Following \cite{Sarkar}, suppose $E$ is a bad event to be avoided, then denote $\mathrm{vbl}(E)$ as the minimum subset of array columns on which $E$ depends.
+For construction, the Moser-Tardos randomized polynomial time algorithm searches for any bad event $E$, and then randomly resamples all columns of $\mathrm{vbl}(E)$.
+This process of searching and resampling is repeated until no more bad events exist and the array is a valid covering or locating array.
+The sufficient condition for the lemma, however, requires that the event probabilities be sufficiently small.
+To reduce these probabilities, tests (rows) must be added to the array.
+
+\section{Analysis Work} \label{sect:rel_analysis}
+
+After construction is complete, the tests indicated by the locating array must be run, and analysis must be performed on the results to determine the significant factors.
+Analysis therefore uses the response of the tests and the corresponding locating array to determine factor significance.
+The result of the analysis step is the set of significant factors.
+
+Locating arrays, however, provide unique challenges in analysis.
+First, the number of potentially significant main effects and interactions is large.
+For example, a $(\overline{1},\overline{2})$-locating array with $k = 100$ factors and $\ell = 5$ levels for every factor, distinguishes approximately 125,000 main effects and interactions.
+Any analysis strategy for locating arrays would thus need to analyze all of these possible terms.
+Second, locating arrays may exhibit high imbalance.
+All main effects and interactions are covered in a locating array, but some terms are covered much more than others.
+In the locating array in Table \ref{tab:intro_la}, some interactions appear three times (e.g., $F_3=v_3$ \& $F_1=v_1$) while others appear just once (e.g., $F_3=v_3$ \& $F_2=v_3$).
+Analysis strategies for locating arrays should not be biased towards terms that are covered more often than others.
+
+Many approaches exist to determine which terms are significant when the number of possible terms, or predictors, is large.
+There are model-based approaches, where models are built to explain the response, and model-free approaches, where the significant terms are found without building an explicit model \cite{SIS}.
+In model-based approaches, there are different types of models that can be built.
+Among others, there are linear models, along with models that use parameterization to produce complex models \cite{SIS}.
+
+Colbourn et al.\ \cite{Compton-et-al-LA} introduce the use of a compressive sensing matrix with a locating array to generate prospective terms for linear modeling.
+The compressive sensing matrix contains a separate column for each term.
+Table \ref{tab:intro_cs} is the compressive sensing matrix for the locating array in Table \ref{tab:intro_la}.
+For each column, $+1$ is placed in the rows where the term is covered (the rows in $\rho(A',T)$, where $T$ is the main effect or interaction), and $-1$ is placed in the remaining rows.
+To conserve space, every $+1$ is written as $+$ and every $-1$ is written as $-$ in the table.
+We also include a column with $+1$ in every row as the $\mathit{INTERCEPT}$ to account for any effects that exist in the system regardless of the factor assignments.
+Interestingly, in any compressive sensing matrix corresponding to a locating array, every column must be unique because the set of rows covered by each term must be unique.
+This work exclusively investigates linear modeling of the response using the columns of a compressive sensing matrix.
+While transformations can be applied to the predictors (columns of the compressive sensing matrix) to produce complex models \cite{SIS}, this work focuses exclusively on screening using linear models with an optional transformation applied to the response.
+
+\begin{center}
+\begin{table}[htbp]
+\caption{Compressive Sensing Matrix - First Example}
+\label{tab:intro_cs}
+\setlength\tabcolsep{2pt} % default value: 6pt
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{30}{|c|}{Compressive Sensing Matrix} \\
+\hline
+\rot{$\mathit{INTERCEPT}$} &
+\rot{$F_1=v_1$} &
+\rot{$F_1=v_2$} &
+\rot{$F_2=v_1$} &
+\rot{$F_2=v_2$} &
+\rot{$F_2=v_3$} &
+\rot{$F_3=v_1$} &
+\rot{$F_3=v_2$} &
+\rot{$F_3=v_3$} &
+\rot{$F_2=v_1$ \& $F_1=v_1$} &
+\rot{$F_2=v_1$ \& $F_1=v_2$} &
+\rot{$F_2=v_2$ \& $F_1=v_1$} &
+\rot{$F_2=v_2$ \& $F_1=v_2$} &
+\rot{$F_2=v_3$ \& $F_1=v_1$} &
+\rot{$F_2=v_3$ \& $F_1=v_2$} &
+\rot{$F_3=v_1$ \& $F_1=v_1$} &
+\rot{$F_3=v_1$ \& $F_1=v_2$} &
+\rot{$F_3=v_1$ \& $F_2=v_1$} &
+\rot{$F_3=v_1$ \& $F_2=v_2$} &
+\rot{$F_3=v_1$ \& $F_2=v_3$} &
+\rot{$F_3=v_2$ \& $F_1=v_1$} &
+\rot{$F_3=v_2$ \& $F_1=v_2$} &
+\rot{$F_3=v_2$ \& $F_2=v_1$} &
+\rot{$F_3=v_2$ \& $F_2=v_2$} &
+\rot{$F_3=v_2$ \& $F_2=v_3$} &
+\rot{$F_3=v_3$ \& $F_1=v_1$} &
+\rot{$F_3=v_3$ \& $F_1=v_2$} &
+\rot{$F_3=v_3$ \& $F_2=v_1$} &
+\rot{$F_3=v_3$ \& $F_2=v_2$} &
+\rot{$F_3=v_3$ \& $F_2=v_3$} \\
+\hline
+ + &	 - &	 + &	 - &	 - &	 + &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 + &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 - \\
+ + &	 - &	 + &	 + &	 - &	 - &	 + &	 - &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 + &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - \\
+ + &	 + &	 - &	 + &	 - &	 - &	 - &	 + &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 + &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - \\
+ + &	 - &	 + &	 - &	 + &	 - &	 - &	 - &	 + &	 - &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 + &	 - &	 + &	 - \\
+ + &	 - &	 + &	 - &	 - &	 + &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 + &	 - &	 + &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - \\
+ + &	 + &	 - &	 - &	 - &	 + &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 + &	 - &	 - &	 - &	 + \\
+ + &	 + &	 - &	 - &	 + &	 - &	 + &	 - &	 - &	 - &	 - &	 + &	 - &	 - &	 - &	 + &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - \\
+ + &	 - &	 + &	 - &	 + &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 + &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - \\
+ + &	 + &	 - &	 + &	 - &	 - &	 - &	 - &	 + &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 + &	 - &	 + &	 - &	 - \\
+\hline
+ + &	 + &	 - &	 - &	 - &	 + &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 + &	 - &	 + &	 - &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - \\
+ + &	 - &	 + &	 + &	 - &	 - &	 - &	 + &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 + &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - \\
+ + &	 + &	 - &	 - &	 + &	 - &	 - &	 - &	 + &	 - &	 - &	 + &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 - &	 + &	 - &	 - &	 + &	 - \\
+\hline
+\end{tabular}
+\end{table}
+\end{center}
+
+Sure independence screening (SIS) is a screening approach for a high number of terms using linear models \cite{SIS}.
+In SIS, a response vector (response of the locating array tests) is modeled with terms chosen from a pool of predictor vectors (columns of the compressive sensing matrix).
+Predictor vectors are individually ranked using the dot product of the predictor vector and the response vector divided by the length of the vectors, known as the Pearson correlation \cite{SIS}.
+This ranking of predictor vectors indicates their correlation with the response vector.
+Finally, the predictors that are highly correlated with the response are chosen as the result of the screening process.
+
+In some cases, however, issues can arise in SIS.
+For example, if an insignificant term is highly correlated with a significant term \cite{IterativeSIS}, then SIS is likely to rank both terms highly and fails to eliminate the insignificant term.
+Iterative SIS \cite{IterativeSIS} is similar to the SIS screening approach but is done in steps.
+In the $i$-th step, iterative SIS uses the SIS approach to select $k_i$ relevant terms, and the residual vector that remains after selecting the terms replaces the response vector in the $(i + 1)$-st step \cite{IterativeSIS}.
+The $k_i$ variable for each step can be chosen in a variety of ways, but if it is always equal to one, then iterative SIS is a form of matching pursuit \cite{IterativeSIS}.
+
+The critical aspect of SIS is how correlation is determined between the predictor vectors (columns of the compressive sensing matrix) and the response vector.
+Previously, we discussed the use of the Pearson correlation to determine the ranking of the predictors.
+However, other ranking strategies also exist in SIS, including the marginal rank correlation which can behave better than the Pearson correlation in some situations \cite{SIS}.
+
+We now discuss two screening experiments using locating array designs in Section \ref{sect:rel_dfs_analysis} \cite{Compton-et-al-LA} and Section \ref{sect:rel_stat_analysis} \cite{AldacoCS15}.
+In both, the analysis of the associated data resembles a "heavy-hitters" algorithm to construct a response model.
+Both maintain a current model and a current residual vector.
+The model is initialized as an intercept term with coefficient equal to the mean of the measured response data, while the residuals are equal to the data minus the model's predictions of it. 
+
+In each iteration, the most significant term impacting the response vector is selected to add to the model.
+The two analysis methods differ, however, in \textit{how} the most significant term is selected.
+Least squares is then used to update the model coefficients.
+As in iterative SIS, the residuals are then calculated and replace the response vector in the next iteration.
+These steps are repeated until a stopping criterion is met. 
+The two analysis methods make use of a limit on the number of terms and a desired $R^2$ (coefficient of determination) threshold.
+
+\subsection{Orthogonal Matching Pursuit} \label{sect:rel_dfs_analysis}
+
+Orthogonal matching pursuit (OMP) is a compressive sensing-based analysis approach used for term selection in \cite{Compton-et-al-LA}.
+In each iteration, a term is selected to add to the model based on the dot product of the normalized residuals with each candidate term's normalized column in a compressive sensing matrix.
+The term yielding the highest-magnitude dot product is added to the model, after which ordinary (linear) least squares is used to update the model coefficients.
+A dot product is used because a dot product of zero indicates a complete lack of correlation between a term and the data, a dot product of $1$ indicates perfect correlation, and a dot product of $-1$ indicates a perfect anti-correlation. 
+Also, the dot product is linear in each argument fitting well with using least squares to update the model coefficients.
+This approach is similar to iterative SIS with $k = 1$ and using the Pearson correlation.
+Because OMP can only add terms to a model, a tree is developed in \cite{Compton-et-al-LA} in a depth-first manner to represent terms that have been added, and backjumping provides a mechanism for exploring alternative models.
+
+\subsection{Statistical Approach} \label{sect:rel_stat_analysis}
+
+Along with the challenge of a large number of possible terms, locating arrays also present difficulties because of their imbalance.
+In \cite{AldacoCS15}, to cope with the imbalance in coverage, the factors are grouped according to the number of times each value is covered in the locating array.
+In each iteration of the heavy hitters algorithm, the first step selects the most significant main effect or two-way interaction from each group using the Wilcoxon rank sum test and the Mann-Whitney U-test \cite{Fay2010, Mann1947, Wilcoxon1945}.
+Then from these candidates, the most significant main effect or two-way interaction overall is selected using the Akaike information criterion \cite{Akaike1974}.
+Weighted least squares is also used to update the model coefficients.
+
+\section{Summary}
+
+The Lov{\'a}sz Local Lemma with Moser-Tardos resampling has been used for covering array construction \cite{Sarkar}.
+Chapter \ref{chptr:construction} focuses on using the same resampling strategy, but for locating array construction.
+Analysis results are also presented from several locating arrays constructed using this approach.
+Chapter \ref{chptr:analysis} explores the analysis step by extending the work in \cite{AldacoCS15,Compton-et-al-LA}.

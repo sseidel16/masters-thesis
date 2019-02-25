@@ -1,0 +1,15 @@
+digraph {
+    rankdir = LR
+    zotacB2; zotacF3; zotacI4; zotacM20
+
+    subgraph Rel1 {
+        edge [dir=none]
+        zotacB2 -> zotacF3 -> zotacI4 -> zotacM20
+    }
+
+    subgraph Rel2 {
+        edge [color=green]
+
+        zotacB2 -> zotacM20
+    }
+}

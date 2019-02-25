@@ -1,0 +1,338 @@
+\chapter{Analysis} \label{chptr:analysis}
+
+Following the construction of a locating array, the experiments indicated by the array are performed, and results are measured as one or more output variables.
+The results must now be analyzed to determine which factors are relevant.
+As discussed in Chapter \ref{chptr:introduction}, locating arrays grow logarithmically in the number of factors, making the consideration of an order of magnitude more factors in experimentation practical.
+However, to achieve the logarithmic growth rate, locating arrays can be highly unbalanced, and thus new techniques for the analysis of locating arrays are required.
+
+This chapter discusses two existing approaches for analyzing data collected from experimentation based on a locating array introduced in Section \ref{sect:rel_stat_analysis} and Section \ref{sect:rel_dfs_analysis}.
+It also describes a new time- and space-efficient analysis technique that is able to support large-scale experimentation and cope with noise in measurements.
+The new analysis technique is then used to validate the results from two screening experiments based on locating arrays, one conducted on the \texttt{w-iLab.t} wireless network testbed in Belgium varying 24 factors, and the other conducted in a wireless network simulator varying 75 factors.
+Our experimental design and analysis techniques are available for use \cite{mehari2017} in large-scale screening experiments, the first phase of any goal of experimentation.
+
+\section{Analysis Motivation} \label{sect:motivation}
+
+Section \ref{sect:rel_stat_analysis} describes an initial existing analysis technique using a statistical approach.
+The approach could be generalized and automated for analysis in other screening experiments, but does not consider alternate explanations for noise in the system.
+A second existing analysis technique in Section \ref{sect:rel_dfs_analysis} provides another approach using a depth-first search (DFS) of an explicit tree.
+This second approach is general and considers noise, but the algorithm provided is inefficient.
+The recursive backjumping employed by the DFS algorithm requires many models and decisions to be tracked which makes memory-efficient implementations difficult.
+The DFS algorithm also provides very little control over the runtime of the algorithm.
+Our aim is to provide a general, simple, and efficient algorithm for analysis that allows for easy implementation and optimization.
+
+\section{Introducing a New Approach} \label{sect:approach}
+
+We propose a new approach that achieves the same analysis using the same basic "heavy-hitters" method as in existing approaches.
+However, the algorithm is novel in that it uses a branch-and-bound approach, conducting the search in a breadth-first manner, storing the tree implicitly in a number of priority queues.
+It bounds the number of models in each queue using $R^2$.
+Bounds on the number and size of the queues provide parameters to trade running time and space to achieve exploration of a larger portion of the tree. 
+Pseudocode for the new branch-and-bound BFS tree-based analysis is given in Algorithm \ref{alg:bfs_analysis}.
+
+Our new approach borrows many ideas from the previous two approaches, but also introduces new ideas in the process.
+It uses the same type of "heavy-hitters" algorithm and OMP technique as the existing DFS technique.
+However, the approach discussed in Section \ref{sect:rel_dfs_analysis} \cite{Compton-et-al-LA} uses a safety parameter to dictate where to perform back-jumping on the implicit tree.
+This parameter helps compare multiple other alternative models that each may contain a different number of terms.
+We eliminate this parameter to simplify the process and switch to a BFS approach, eliminating the need to compare alternative models that may each contain a different number of terms.
+
+\begin{algorithm}[pthb]
+\caption{$\mathrm{BFS\_Analysis}(\mathit{terms}, M, \mathit{data}, \mathit{nTerms}, \mathit{nNewModels}, \mathit{nModels})$}
+\label{alg:bfs_analysis}
+
+\begin{algorithmic}[1]
+\REQUIRE List of candidate terms, compressive sensing matrix, vector of performance data, terms per model, number of new models to generate for a particular model, number of models to return
+\ENSURE $\mathit{nModels}$ best models with $nTerms$ terms each
+\STATE {Initialize $nTerms + 1$ priority queues, each with maximum $\mathit{nModels}$}
+\STATE $model_{new} \gets$ [empty model with no terms]
+\STATE $residuals_{new} \gets data$
+\STATE enqueue($queue_{0},(model_{new},residuals_{new})$)
+\FOR{$\ell \gets 0,...,nTerms-1$}
+	\WHILE{$queue_{\ell}$ has models}
+		\STATE $(model,residuals) \gets $dequeue($queue_{\ell}$)
+		\FOR{$i \gets 1,...,nNewModels$}
+			\STATE $k \gets$ [$i^{th}$ most significant term from $M$]
+			\STATE $model_{new} \gets \mathrm{LS}(terms(model) \cup [terms_k],data)$
+			\STATE $residuals_{new} \gets residuals - model_{new}$
+			\STATE enqueue($queue_{\ell+1},(model_{new},residuals_{new})$)
+		\ENDFOR
+	\ENDWHILE
+\ENDFOR
+\RETURN $queue_{nTerms}$
+\end{algorithmic}
+\end{algorithm}
+
+Ultimately, the new BFS tree analysis algorithm attempts to find the models with the highest $R^2$ values, each with $nTerms$ terms, in a straightforward manner.
+It starts by initializing the zeroth priority queue to hold the empty model with $R^2 = 0$. 
+The algorithm then removes the model from the zeroth priority queue, and generates $nNewModels$ models, each with one term from the most significant terms of the compressive sensing matrix, $M$, selected by OMP. 
+This differs from the DFS tree algorithm by considering multiple models rather than exploring a single model at a time.
+Least squares is run on each of these models to obtain their $R^2$ values, and they are then placed in the first priority queue, ranked by $R^2$. 
+
+The process is repeated on the first priority queue to generate new models, each with two terms, that are added to the second priority queue. 
+Each queue only stores the best models by $R^2$ up to its bound, $nModels$.
+If a queue is full, then an attempt to enqueue a model with $R^2$ lower than the model with the lowest $R^2$ does not succeed.
+Similarly, an attempt to enqueue a model with $R^2$ greater than the model with the lowest $R^2$ evicts that model from the queue. 
+The process is repeated until the final priority queue contains $nModels$ models each with $nTerms$ terms.
+ 
+The parameters of the BFS tree algorithm, $nModels$, $nNewModels$, and $nTerms$ can be adjusted as desired.
+Higher values of $nNewModels$ result in more models fit using least squares, thus increasing execution time, but also increasing the likelihood that the models with the best $R^2$ values are found. 
+Lower values of $nNewModels$ result in fewer models fit, decreasing execution time but possibly resulting in models with lower $R^2$ values found.
+Similarly, higher values of $nModels$ lead to a larger bound on the number of models stored and analyzed, increasing execution time. 
+Lower values of $nModels$ risk discarding a model that might become much better, with respect to $R^2$, when more terms are added.
+Finally, the parameter $nTerms$ must be chosen carefully to propery fit the model.
+When $nTerms$ is too small, the analysis does not find all terms relevant to the system and produces poor models, and when $nTerms$ is too large, the analysis overfits the models.
+In Chapter \ref{chptr:conclusion}, we discuss choosing $nModels$, $nNewModels$, and $nTerms$ dynamically in future work.
+
+Another issue that must be accounted for is that of duplicate models. 
+It is possible that multiple models with identical terms, but in different orders, are added to the same priority queue. 
+%For example, consider two models added to the first priority queue, one with term $A$ and the other with term $B$. 
+%Suppose again that the model with term $A$ has term $B$ added to it, and that the model with term $B$ has term $A$ added to it. 
+%If both models are added to the second priority queue there are two models with the same terms. 
+The algorithm must discard such duplicate models. % when their $R^2$ values are identical.
+
+When the algorithm completes, the final priority queue holds, at most, the number of models given by $nModels$. 
+These models are ordered by $R^2$ and given as the best models each with $nTerms$ terms.
+
+The execution time and memory usage of Algorithm \ref{alg:bfs_analysis} can be easily adjusted using the parameters $nModels$, $nNewModels$, and $nTerms$.
+Our approach iterates through $nTerms$ priority queues, extracts $nModels$ from each, finds the best terms using OMP dictated by $nNewModels$, and performs least squares after adding each term. 
+Assuming least squares takes, in the worst case, time $nTerms$, the execution time for this algorithm is $O( \mathit{nTerms}^{2} \cdot \mathit{nModels} \cdot \mathit{nNewModels} )$. 
+This approach also considers one priority queue at a time, each with size $nModels$. 
+Assuming each model takes constant space, the memory usage is $O(nModels)$. 
+
+In screening, we are interested in identifying the most significant factors and two-way interactions impacting performance.
+One way to determine the screening results is to examine occurrences of the factors in these models and select those occurring most often.
+We discuss this next.
+
+\section{Counting Occurrences} \label{sect:occurrences}
+
+The new BFS analysis approach produces and returns the top $\mathit{nModels}$ models.
+In the top models generated, many factors are included multiple times in multiple models.
+We count the occurrences of each factor in the top $\mathit{nModels}$ models, and rank the factors by number of occurrences.
+Because terms in a model can be interactions between factors, or a factor can appear with different levels, the same factor may occur multiple times in the same model. 
+A factor {\em occurrence} is defined as any time a factor appears in a model, no matter its level, or if it is part of an interaction.
+An interaction {\em occurrence} is defined as any time a pair of factors appear in a model as an interaction, no matter the level of either factor. 
+In the following section, we rank all factors by how often they occur in the top $\mathit{nModels}$ models.
+Interactions are also examined but with a separate ranking.
+We hypothesize that a significant factor occurs frequently in the top models and is therefore highly ranked, while an insignificant factor rarely appears in the ranking, if at all.
+
+\section{Validation} \label{sect:validation}
+
+We compare our BFS tree algorithm to the DFS tree algorithm in \cite{Compton-et-al-LA}.
+We use a C++ implementation to generate the top 50 models, with 11 terms each, using our BFS tree algorithm for both voice quality and RF exposure. 
+Finally, we count the occurrences of each factor in the top 50 models and rank all factors by the number of occurrences. 
+We use the same testbed data collected and used in \cite{Compton-et-al-LA}.
+The full-factorial design for this factor space has over $10^{13}$ tests while the locating array has only 109 tests.
+
+Table \ref{tab:validate-mos} shows the factors ranked by the number of occurrences in our BFS tree results for the voice quality performance metric.
+The table also indicates the factors selected by the DFS algorithm \cite{Compton-et-al-LA}.
+Three of the four significant factors for voice quality listed in \cite{Compton-et-al-LA} are the top three factors in our BFS tree results. 
+This indicates a strong correspondence between the output of the DFS and BFS algorithms with the difference likely due to the DFS algorithm exploring a different, or smaller, portion of the search tree since it stops after generating 1024 models.
+This also likely accounts for the BFS algorithm not agreeing with the fourth significant factor.
+
+\begin{table}
+\caption{Significant factors impacting voice quality from data collected from the \texttt{w-iLab.t} testbed.}
+\label{tab:validate-mos}
+
+\begin{tabularx}{\textwidth}{|2|7|1|}
+\hline
+\multicolumn{3}{|c|}{\textbf{BFS Occurrence Counts}} \\
+\hline
+Count & Factor & In \cite{Compton-et-al-LA} \\
+\hline
+150	& $\mathit{intCOR}$					& $\surd$ \\
+136	& $\mathit{band}$					& $\surd$ \\
+133	& $\mathit{txpower}$				& $\surd$ \\
+100	& $\mathit{sensing}$				& \\
+ 71	& $\mathit{rate}$					& \\
+ 48	& $\mathit{udp\_mem\_pressure}$		& \\
+ 48	& $\mathit{ipfrag\_low\_thresh}$	& \\
+ 34	& $\mathit{wmem\_max}$				& \\
+ 22	& $\mathit{codecBitrate}$			& $\surd$ \\
+ 16	& $\mathit{txqueuelen}$				& \\
+ 15	& $\mathit{mtu}$					& \\
+ 14	& $\mathit{channel}$				& \\
+ 12	& $\mathit{frameLen}$				& \\
+  9	& $\mathit{wmem\_default}$			& \\
+  7	& $\mathit{ROHC}$					& \\
+  6	& $\mathit{codec}$					& \\
+  5	& $\mathit{ipfrag\_high\_thresh}$	& \\
+  5	& $\mathit{udp\_wmem\_min}$			& \\
+  4	& $\mathit{udp\_rmem\_min}$			& \\
+  3	& $\mathit{rmem\_max}$				& \\
+  3	& $\mathit{qdisc}$					& \\
+  1	& $\mathit{rmem\_default}$			& \\
+  1	& $\mathit{udp\_mem\_min}$			& \\
+  \hline
+\end{tabularx}
+
+\end{table}
+
+Interestingly, our BFS tree analysis identified some potential two-way interactions for voice quality that the DFS tree analysis did not identify.
+Table \ref{tab:2way-mos} shows the top interactions; in this case, they exhibit strong heredity.
+
+\begin{table}
+\caption{Significant two-way interactions impacting voice quality from data collected from \texttt{w-iLab.t}.}
+\label{tab:2way-mos}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{\textbf{BFS Occurrence Counts}} \\
+\hline
+Count & Interaction \\
+\hline
+ 51	& $\mathit{intCOR}$ \& $\mathit{band}$ \\
+ 49	& $\mathit{intCOR}$ \& $\mathit{sensing}$ \\
+ 49	& $\mathit{sensing}$ \& $\mathit{band}$ \\
+ 48	& $\mathit{udp\_mem\_pressure}$ \& $\mathit{ipfrag\_low\_thresh}$ \\
+ 33	& $\mathit{rate}$ \& $\mathit{band}$ \\
+ 30	& $\mathit{rate}$ \& $\mathit{wmem\_max}$ \\
+ 11	& $\mathit{txqueuelen}$ \& $\mathit{frameLen}$ \\
+  9	& $\mathit{txpower}$ \& $\mathit{channel}$ \\
+  9	& $\mathit{wmem\_default}$ \& $\mathit{codecBitrate}$ \\
+  8	& $\mathit{mtu}$ \& $\mathit{txpower}$ \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+Table \ref{tab:validate-exp} shows the factors ranked by the number of occurrences in our BFS tree results for the RF exposure performance metric. 
+For exposure, five of the top six factors match in the two algorithms.
+The largest number of occurrences of any two-way interaction for exposure was only six, so we do not consider any interaction to be significant.
+
+\begin{table}[h]
+\caption{Significant factors impacting RF exposure from data collected from the \texttt{w-iLab.t} testbed.}
+\label{tab:validate-exp}
+
+\begin{tabularx}{\textwidth}{|2|7|1|}
+\hline
+\multicolumn{3}{|c|}{\textbf{BFS Occurrence Counts}} \\
+\hline
+Count & Factor & In \cite{Compton-et-al-LA} \\
+\hline
+156	& $\mathit{rate}$					& $\surd$ \\
+152	& $\mathit{txpower}$				& $\surd$ \\
+ 98	& $\mathit{codecBitrate}$			& $\surd$ \\
+ 60	& $\mathit{frameLen}$				& $\surd$ \\
+ 56	& $\mathit{band}$					& $\surd$ \\
+  4	& $\mathit{codec}$					& \\
+  4	& $\mathit{ROHC}$					& \\
+  2	& $\mathit{wmem\_max}$				& \\
+  2	& $\mathit{ipfrag\_low\_thresh}$	& \\
+  2	& $\mathit{udp\_mem\_min}$			& \\
+  2	& $\mathit{qdisc}$					& \\
+  2	& $\mathit{channel}$				& \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The factors screened as significant are plausible. 
+For example, one would expect that transmission power ($\mathit{txpower}$) should have an effect on both exposure and audio quality, and that interference should have an effect on audio quality but not exposure.
+
+Our comparisons show a strong correspondence to the results obtained from the DFS tree algorithm in \cite{Compton-et-al-LA} and our BFS tree algorithm therefore validates the screening analysis in \cite{Compton-et-al-LA}. 
+In addition, our new approach is more memory efficient and provides parameters to control runtime.
+Indeed, the BFS tree algorithm is able to analyze the even larger-scale data collected from experimentation in simulation described next, where the DFS tree algorithm was unable to complete the analysis because of memory constraints.
+
+In \cite{AldacoCS15}, 75 factors of the protocols spanning the MAC to the transport layer, as well as the wireless environment and the simulation environment, having from two to ten values each, were screened in a simulation model of a mobile wireless network.
+The goal was to determine the significant factors and two-way interactions impacting TCP throughput.
+The full-factorial design for this factor space is even larger than the testbed experiment; it has over $10^{43}$ tests in the array! 
+In contrast, the locating array has only 421 tests.
+
+Aldaco et al.\ \cite{AldacoCS15} perform screening analysis on the data collected from simulation using the method described in Section \ref{sect:rel_stat_analysis}.
+A model with 13 terms having 9 unique factors are identified as significant.
+We use our BFS tree algorithm to perform screening analysis on the same data set. 
+The parameters for our algorithm were set to produce 50 models, each with 13 terms; these models differed very little in $R^2$ values. 
+
+We again counted the occurrences of each factor in the top 50 models and ranked all factors by the number of occurrences. 
+Table \ref{tab:tput-sim} shows the resulting ranking and an indicator when the factor is also identified as significant in \cite{AldacoCS15}. 
+Interestingly, the top eight factors, by number of occurrences, are also factors identified by Aldaco et al.\ \cite{AldacoCS15} as significant. 
+Therefore, eight of the nine factors identified by Aldaco et al.\ were the top eight factors identified by the BFS tree algorithm. 
+We also counted the occurrences of interactions between two factors and ranked all interactions by the number of occurrences. 
+%Even though our analysis includes the levels in the interactions it finds, we did not include them in our occurrences ranking for simplicity. 
+
+Table \ref{tab:inter-sim} shows the interactions ranked by the number of occurrences in the BFS tree results and an indicator when the interaction is also identified in \cite{AldacoCS15} as significant. 
+Interestingly, three of the top four interactions, by number of occurrences, were also interactions identified by Aldaco et al.\ as significant.
+However, Aldaco et al.\ did identify a fourth interaction that was not found by the BFS tree algorithm. 
+
+\begin{table}
+\centering
+\caption{Significant factors impacting TCP throughput from data collected from a wireless network simulation.}
+\label{tab:tput-sim}
+
+\begin{tabularx}{\textwidth}{|2|7|1|}
+\hline
+\multicolumn{3}{|c|}{\textbf{BFS Occurrence Counts}} \\
+\hline
+Count & Factor & In \cite{AldacoCS15} \\
+\hline
+148	& $\mathit{MAC\_RTSThreshold}$			& $\surd$ \\
+142	& $\mathit{ErrorModel\_unit}$			& $\surd$ \\
+100	& $\mathit{TCP\_packetSize}$			& $\surd$ \\
+100	& $\mathit{TCP\_min\_RTO}$				& $\surd$ \\
+100	& $\mathit{ErrorModel\_ranvar}$			& $\surd$ \\
+ 98	& $\mathit{RWP\_Area}$					& $\surd$ \\
+ 53	& $\mathit{ErrorModel\_rate}$			& $\surd$ \\
+ 50	& $\mathit{ARP\_flows}$					& $\surd$ \\
+ 27	& $\mathit{Propagation}$				& \\
+ 26	& $\mathit{DSSS\_CWMin\_CWMax}$			& \\
+ 25	& $\mathit{TCP\_slow\_start\_restart}$	& \\
+ 16	& $\mathit{TCP\_RTTvar\_exp}$			& $\surd$ \\
+ 15	& $\mathit{TCP\_maxburst}$				& \\
+ 13	& $\mathit{Queue\_acksfirst}$			& \\
+ 12	& $\mathit{AODV\_TTL\_START}$			& \\
+  8	& $\mathit{ENER\_initialEnergy}$		& \\
+  8	& $\mathit{MAC\_ProbeDelay}$			& \\
+  8	& $\mathit{TCP\_updated\_rttvar}$		& \\
+  5	& $\mathit{TCP\_numdupacksFrac}$		& \\
+  3	& $\mathit{AODV\_HELLO\_INTERVAL}$		& \\
+  3	& $\mathit{TCP\_decrease\_num}$			& \\
+  3	& $\mathit{MAC\_ScanType}$				& \\
+  3	& $\mathit{Queue\_DT\_queue\_in\_bytes}$	& \\
+  3	& $\mathit{Queue\_interleave}$			& \\
+  2	& $\mathit{Queue\_ackfromfront}$		& \\
+  2	& $\mathit{TCP\_rttvar\_init}$			& \\
+  1	& $\mathit{Queue\_DT\_summarystats}$	& \\
+  1	& $\mathit{TCP\_TRTTVAR\_BITS}$			& \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+\begin{table}
+\centering
+\caption{Significant two-way interactions impacting TCP throughput in a wireless network simulation.}
+\label{tab:inter-sim}
+
+\begin{tabularx}{\textwidth}{|2|7|1|}
+\hline
+\multicolumn{3}{|c|}{\textbf{BFS Occurrence Counts}} \\
+\hline
+Count & Interaction & In \cite{AldacoCS15} \\
+\hline
+56	& $\mathit{RWP\_Area}$ \& $\mathit{MAC\_RTSThreshold}$				& \\
+50	& $\mathit{ErrorModel\_rate}$ \& $\mathit{ErrorModel\_unit}$		& $\surd$ \\
+50	& $\mathit{MAC\_RTSThreshold}$ \& $\mathit{ErrorModel\_ranvar}$		& $\surd$ \\
+50	& $\mathit{ErrorModel\_unit}$ \& $\mathit{ErrorModel\_ranvar}$		& $\surd$ \\
+42	& $\mathit{MAC\_RTSThreshold}$ \& $\mathit{ErrorModel\_unit}$		& \\
+26	& $\mathit{DSSS\_CWMin\_CWMax}$ \& $\mathit{Propagation}$			& \\
+16	& $\mathit{TCP\_min\_RTO}$ \& $\mathit{TCP\_slow\_start\_restart}$	& \\
+14	& $\mathit{TCP\_maxburst}$ \& $\mathit{TCP\_RTTvar\_exp}$			& \\
+8	& $\mathit{ARP\_flows}$ \& $\mathit{TCP\_slow\_start\_restart}$		& \\
+8	& $\mathit{RWP\_Area}$ \& $\mathit{Queue\_acksfirst}$				& \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+Again, our comparisons show a strong correspondence to the results presented in Aldaco et al.\ \cite{AldacoCS15}.
+It is therefore reasonable to conclude that our BFS tree analysis algorithm successfully identifies those factors and two-way interactions, that are most significant to the TCP throughput of the mobile wireless network.
+It is also reasonable to conclude that counting occurrences is a valid approach for determining what factors are most significant from the top $\mathit{nModels}$.
+A better approach than counting occurrences may exist but we leave this problem for future work in Chapter \ref{chptr:conclusion}.
+
+\section{Summary}
+
+Algorithm \ref{alg:bfs_analysis} is a simple, general, and efficient analysis approach for the output measurements from locating arrays.
+The algorithm can be used to analyze any locating array with its corresponding output measurements to find significant factors and interactions.
+It uses three input parameters that control how many models are stored, how many alternative models to check, and how many terms to add to each model.
+These parameters are currently static throughout the analysis execution.
+Future work includes the possibility of modifying these parameters to be dynamic.
+Furthermore, the algorithm assumes that the significant system factors and interactions follow a "heavy-hitters" pattern.
+The next chapter investigates this assumption and how the algorithm behaves when the system does not follow this pattern.

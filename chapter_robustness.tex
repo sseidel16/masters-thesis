@@ -1,0 +1,1687 @@
+\chapter{Robustness} \label{chptr:robustness}
+
+During the discussion of our new analysis technique in Section \ref{sect:approach}, an assumption was made that the system factors must follow a "heavy-hitters" pattern.
+We also did not discuss how noise might affect our analysis technique, although noise is always present in real-world applications and often introduced in simulated systems.
+In this chapter, we discuss "heavy-hitters" and see how robust our analysis is when the assumption is violated.
+We also discuss the effects of noise in the system on the analysis algorithm.
+Chapter \ref{chptr:construction} introduces separation and hypothesizes that higher separation leads to more accurate results in analysis.
+This chapter investigates how separation might help, particularly when a large amount of noise is introduced.
+Finally, Section \ref{sect:interesting} discusses an interesting phenomenon that was coincidentally discovered when investigating the effects of noise.
+
+\section{"Heavy-Hitters" Requirement} \label{sect:heavyhitters}
+
+In Chapter \ref{chptr:analysis}, we discussed how our analysis algorithm assumes a "heavy-hitters" scenario.
+We call this the "heavy-hitters" requirement.
+The analysis is thus a method that relies on the assumption that there is one term, a main effect or interaction, that affects the output more significantly than all remaining terms, and when this significant term is removed, there again exists one main effect or interaction that affects the output more significantly than all remaining terms.
+In other words, the significance of the factors and interactions follows an exponentially decreasing pattern that allows them to be easily identified, one by one, over all other terms.
+In this section, we begin with a simple example of when the "heavy-hitters" requirement is satisfied, and when it is not.
+We then move on to more complex examples.
+
+Suppose the true model for a system is given in Table \ref{tab:scenario_1a}.
+This means that the output of the system is determined by the specific terms listed, along with their coefficients, i.e., the output is a function of the form $a \cdot T_{3} + b \cdot T_{4} + c \cdot \mathit{INTERCEPT}$.
+We then attempt to use our analysis algorithm to recover the true terms of the model using only the output of the system.
+A partial CS matrix along with the output (responses) of the system are also given in Table \ref{tab:scenario_1a}.
+
+\begin{table}
+\caption{Robustness Scenario 1A - Without Heavy-Hitters}
+\label{tab:scenario_1a}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model - Does not satisfy "heavy-hitters"} \\
+\hline
+Coefficient & Term \\
+\hline
+1 & $\mathit{INTERCEPT}$ \\
+1 & $T_{3}$ \\
+1 & $T_{4}$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|2|1|1|1|1||4|}
+\hline
+\multicolumn{6}{|c|}{Partial CS Matrix and Responses} \\
+\hline
+$\mathit{INTERCEPT}$ & $T_{1}$ & $T_{2}$ & $T_{3}$ & $T_{4}$ & Response \\
+\hline
+ 1      & 1   & -1  & -1  & -1  & 1        \\
+ 1      & -1  & 1   & -1  & -1  & 1        \\
+ 1      & -1  & -1  & 1   & -1  & -1       \\
+ 1      & -1  & -1  & -1  & 1   & -1       \\
+\hline
+\end{tabularx}
+\end{table}
+
+A trace of the analysis using Algorithm \ref{alg:bfs_analysis} proceeds:
+
+\begin{enumerate}  
+\item The algorithm begins with a model consisting of only the intercept which is the average of all output values:
+	\[
+		0 \cdot \mathit{INTERCEPT}
+	\]
+\item The residuals are:
+	\[
+		{\begin{bmatrix} 1 & 1 & -1 & -1 \end{bmatrix}}^T
+	\]
+\item Absolute dot products calculated for $T_{1}$ to $T_{4}$ are:
+	\[
+		2, 2, 2, 2
+	\]
+\item Because all absolute dot products are the same, any term may be added depending on noise.
+	Suppose the first term, $T_{1}$, is added.
+\item Least squares is now run and the model becomes:
+	\[
+		\frac{1}{3} \cdot \mathit{INTERCEPT} + \frac{2}{3} \cdot T_{1}
+	\]
+\item The residuals are:
+	\[
+		{\begin{bmatrix} 0 & \frac{4}{3} & -\frac{2}{3} & -\frac{2}{3} \end{bmatrix}}^T
+	\]
+\item Absolute dot products calculated for $T_{2}$ to $T_{4}$ are:
+	\[
+		\frac{8}{3}, \frac{4}{3}, \frac{4}{3}
+	\]
+\item $T_{2}$ has the largest absolute dot product and it is added to the model.
+\item Least squares is now run and the model becomes:
+	\[
+		1 \cdot \mathit{INTERCEPT} + 1 \cdot T_{1} + 1 \cdot T_{2}
+	\]
+\item The residuals are:
+	\[
+		{\begin{bmatrix} 0 & 0 & 0 & 0 \end{bmatrix}}^T
+	\]
+\end{enumerate}
+
+The analysis using Algorithm \ref{alg:bfs_analysis} stops because it has now explained the response completely.
+However, the terms in the model recovered do not equal the terms in the true model listed in Table \ref{tab:scenario_1a}.
+This is because the coefficients are all so close together that they can easily hide each other's effects.
+Suppose now we use the true model in Table \ref{tab:scenario_1b} which satisfies the "heavy-hitters" requirement with the same experiments.
+
+\begin{table}
+\caption{Robustness Scenario 1B - With Heavy-Hitters}
+\label{tab:scenario_1b}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model - Does satisfy "heavy-hitters"} \\
+\hline
+Coefficient & Term \\
+\hline
+1 & $\mathit{INTERCEPT}$ \\
+4 & $T_{3}$ \\
+10 & $T_{4}$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|2|1|1|1|1||4|}
+\hline
+\multicolumn{6}{|c|}{Partial CS Matrix and Responses} \\
+\hline
+$\mathit{INTERCEPT}$ & $T_{1}$ & $T_{2}$ & $T_{3}$ & $T_{4}$ & Response \\
+\hline
+ 1      & 1   & -1  & -1  & -1  & -13      \\
+ 1      & -1  & 1   & -1  & -1  & -13      \\
+ 1      & -1  & -1  & 1   & -1  & -5       \\
+ 1      & -1  & -1  & -1  & 1   & 7        \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+A trace of the analysis using Algorithm \ref{alg:bfs_analysis} proceeds:
+
+\begin{enumerate}
+\item The algorithm begins with a model consisting of only the intercept which is the average of all output values:
+	\[
+		-6 \cdot \mathit{INTERCEPT}
+	\]
+\item The residuals are:
+	\[
+		{\begin{bmatrix} -7 & -7 & 1 & 13 \end{bmatrix}}^T
+	\]
+\item Absolute dot products calculated for $T_{1}$ to $T_{4}$ are:
+	\[
+		14, 14, 2, 26
+	\]
+\item $T_{4}$ has the largest absolute dot product and it is added to the model.
+\item Least squares is now run and the model becomes:
+	\[
+		-\frac{5}{3} \cdot \mathit{INTERCEPT} + \frac{26}{3} \cdot T_{4}
+	\]
+\item The residuals are:
+	\[
+		{\begin{bmatrix} -\frac{8}{3} & \frac{8}{3} & \frac{16}{3} & 0 \end{bmatrix}}^T
+	\]
+\item Absolute dot products calculated for $T_{1}$ to $T_{3}$ are:
+	\[
+		\frac{16}{3}, \frac{16}{3}, \frac{32}{3}
+	\]
+\item $T_{3}$ has the largest absolute dot product and it is added to the model.
+\item Least squares is now run and the model becomes:
+	\[
+		1 \cdot \mathit{INTERCEPT} + 4 \cdot T_{3} + 10 \cdot T_{4}
+	\]
+\item The residuals are:
+	\[
+		{\begin{bmatrix} 0 & 0 & 0 & 0 \end{bmatrix}}^T
+	\]
+\end{enumerate}
+
+The analysis using Algorithm \ref{alg:bfs_analysis} has now explained the response completely, and it has recovered the same terms as the true model listed in Table \ref{tab:scenario_1b}.
+Table \ref{tab:scenario_1a} illustrates how failure to meet the "heavy-hitters" requirement can lead to the recovery of models that appear good, but are not the actual model.
+Table \ref{tab:scenario_1b} then shows how meeting the "heavy-hitters" requirement can lead to the recovery of the actual model.
+However, these scenarios are extremely basic, and we now turn to more interesting and realistic examples.
+We use a systematic study on synthetic data because the limitations of our recovery must be understood.
+In real systems, the function we are trying to recover is unknown.
+
+In our more complex examples, we first create a locating array for a set of factors and their levels.
+Next, we create a model with a set of main effects or interactions.
+Artificial experimental output measurements are then generated using the chosen true model.
+The output measurements are initially generated without any noise.
+Finally, we run our analysis software with the constructed locating array and the measured responses, and evaluate how well the analysis can recover the chosen true model.
+
+Suppose we are interested in a screening experiment with 100 factors, $F_{1}, F_{2}, \dots, F_{100}$.
+Each of these factors can be set to 3 levels, $v_1, v_2, v_3$.
+Significant terms can be main effects or interactions.
+The locating array constructed with separation parameter $\delta=1$ has just 70 rows.
+This locating array is used in the sequel unless specified otherwise.
+
+Consider the scenario with the true network model in Table \ref{tab:scenario_2a}.
+The true system model is shown at the top of the table, and includes main effects as well as interactions which are indicated by two main effects separated by an ampersand.
+The parameters for the analysis algorithm are provided just below the true system model.
+Finally, the occurrence counts are shown at the bottom, and the checkmarks in the last column indicate the factors that can also be found in the true model.
+The "heavy-hitters" requirement indicates that the coefficients should follow an exponentially decreasing pattern, but it is clear that the true model completely fails to satisfy this.
+In fact, every single term carries the same coefficient, 0.1, and the coefficients exhibit 0\% decrease between them.
+Yet the analysis found all nine factors in the true model and placed them first.
+However, the four factors ranked six through nine have occurrence counts that are less than 50 indicating that these factors did not appear in every model.
+Therefore, although it ranked them first, the true factors were not included in all of the generated models.
+
+\begin{table}
+\caption{Robustness Scenario 2A - Heavy-Hitters (0\% Decrease)}
+\label{tab:scenario_2a}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model - Coefficients exhibit 0\% decrease} \\
+\hline
+Coefficient & Term \\
+\hline
+0.1 & $F_{29}=v_1$ \\
+0.1 & $F_{98}=v_3$ \& $F_{34}=v_2$ \\
+0.1 & $F_{50}=v_2$ \\
+0.1 & $F_{22}=v_1$ \\
+0.1 & $\mathit{INTERCEPT}$ \\
+0.1 & $F_{69}=v_1$ \& $F_{23}=v_1$ \\
+0.1 & $F_{10}=v_2$ \\
+0.1 & $F_{82}=v_1$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 50 & $F_{82}$ & $\surd$ \\
+ 2 & 50 & $F_{50}$ & $\surd$ \\
+ 3 & 50 & $F_{29}$ & $\surd$ \\
+ 4 & 50 & $F_{22}$ & $\surd$ \\
+ 5 & 50 & $F_{10}$ & $\surd$ \\
+ 6 & 38 & $F_{23}$ & $\surd$ \\
+ 7 & 35 & $F_{34}$ & $\surd$ \\
+ 8 & 34 & $F_{98}$ & $\surd$ \\
+ 9 & 30 & $F_{69}$ & $\surd$ \\
+10 &  6 & $F_{6}$  & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The scenario in Table \ref{tab:scenario_2b} uses a true system model in which coefficients decrease by approximately 9\%.
+The true model is now closer to satisfying the "heavy-hitters" requirement as the term coefficients are no longer the same.
+Again, the analysis found all nine factors in the true model and placed them first.
+Of those, only the factors ranked eight and nine have occurrence counts that are less than 50.
+This means that only two of the true factors were not found in all of the generated models.
+This is an improvement over the previous scenario.
+The last two factors on the occurrence count list are $F_{23}$ and $F_{69}$.
+These factors are only found in one interaction with a small coefficient (0.12) in the true model.
+Hence it is not surprising that they were listed last.
+
+\begin{table}
+\caption{Robustness Scenario 2B - Heavy-Hitters (9\% Decrease)}
+\label{tab:scenario_2b}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model - Coefficients exhibit 9\% decrease} \\
+\hline
+Coefficient & Term \\
+\hline
+0.19 & $F_{29}=v_1$ \\
+0.18 & $F_{98}=v_3$ \& $F_{34}=v_2$ \\
+0.16 & $F_{50}=v_2$ \\
+0.15 & $F_{22}=v_1$ \\
+0.13 & $\mathit{INTERCEPT}$ \\
+0.12 & $F_{69}=v_1$ \& $F_{23}=v_1$ \\
+0.11 & $F_{10}=v_2$ \\
+0.1  & $F_{82}=v_1$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 50 & $F_{98}$ & $\surd$ \\
+ 2 & 50 & $F_{82}$ & $\surd$ \\
+ 3 & 50 & $F_{50}$ & $\surd$ \\
+ 4 & 50 & $F_{34}$ & $\surd$ \\
+ 5 & 50 & $F_{29}$ & $\surd$ \\
+ 6 & 50 & $F_{22}$ & $\surd$ \\
+ 7 & 50 & $F_{10}$ & $\surd$ \\
+ 8 & 23 & $F_{23}$ & $\surd$ \\
+ 9 & 13 & $F_{69}$ & $\surd$ \\
+10 & 10 & $F_{2}$  & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The scenario in Table \ref{tab:scenario_2c} brings the true model even closer to satisfying the "heavy-hitters" requirement.
+All coefficients decrease by 33\%.
+Furthermore, the analysis now not only finds all nine factors in the true model, but all significant factors are now found 50 times, and the tenth factor listed is found only twice.
+This is an extremely sharp drop-off and delineates the nine significant factors from the tenth insignificant factor.
+Such a table of occurrence counts appears useful for screening.
+
+\begin{table}
+\caption{Robustness Scenario 2C - Heavy-Hitters (33\% Decrease)}
+\label{tab:scenario_2c}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model - Coefficients exhibit 33\% decrease} \\
+\hline
+Coefficient & Term \\
+\hline
+1.71 & $F_{29}=v_1$ \\
+1.14 & $F_{98}=v_3$ \& $F_{34}=v_2$ \\
+0.76 & $F_{50}=v_2$ \\
+0.51 & $F_{22}=v_1$ \\
+0.34 & $\mathit{INTERCEPT}$ \\
+0.23 & $F_{69}=v_1$ \& $F_{23}=v_1$ \\
+0.15 & $F_{10}=v_2$ \\
+0.1  & $F_{82}=v_1$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 51 & $F_{69}$ & $\surd$ \\
+ 2 & 51 & $F_{50}$ & $\surd$ \\
+ 3 & 51 & $F_{34}$ & $\surd$ \\
+ 4 & 51 & $F_{23}$ & $\surd$ \\
+ 5 & 51 & $F_{22}$ & $\surd$ \\
+ 6 & 51 & $F_{10}$ & $\surd$ \\
+ 7 & 50 & $F_{98}$ & $\surd$ \\
+ 8 & 50 & $F_{82}$ & $\surd$ \\
+ 9 & 50 & $F_{29}$ & $\surd$ \\
+10 & 2  & $F_{99}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The next section (\ref{sect:noise}) explores how noise affects occurrence counts, and we explore scenarios that satisfy the "heavy-hitters" requirement even more strongly.
+For the sake of completeness, however, and because we contrast against them in the next section, we provide here two more scenarios in Table \ref{tab:scenario_2d} and Table \ref{tab:scenario_2e}.
+The scenario in Table \ref{tab:scenario_2d} changes the coefficients to decrease by 50\%, and the coefficients in Table \ref{tab:scenario_2e} exhibit a 60\% decrease.
+
+\begin{table}
+\caption{Robustness Scenario 2D - Heavy-Hitters (50\% Decrease)}
+\label{tab:scenario_2d}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model - Coefficients exhibit 50\% decrease} \\
+\hline
+Coefficient & Term \\
+\hline
+12.8 & $F_{29}=v_1$ \\
+6.4  & $F_{98}=v_3$ \& $F_{34}=v_2$ \\
+3.2  & $F_{50}=v_2$ \\
+1.6  & $F_{22}=v_1$ \\
+0.8  & $\mathit{INTERCEPT}$ \\
+0.4  & $F_{69}=v_1$ \& $F_{23}=v_1$ \\
+0.2  & $F_{10}=v_2$ \\
+0.1  & $F_{82}=v_1$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 51 & $F_{69}$ & $\surd$ \\
+ 2 & 51 & $F_{50}$ & $\surd$ \\
+ 3 & 51 & $F_{34}$ & $\surd$ \\
+ 4 & 51 & $F_{23}$ & $\surd$ \\
+ 5 & 51 & $F_{22}$ & $\surd$ \\
+ 6 & 51 & $F_{10}$ & $\surd$ \\
+ 7 & 50 & $F_{98}$ & $\surd$ \\
+ 8 & 50 & $F_{82}$ & $\surd$ \\
+ 9 & 50 & $F_{29}$ & $\surd$ \\
+10 &  2 & $F_{99}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+\begin{table}
+\caption{Robustness Scenario 2E - Heavy-Hitters (60\% Decrease)}
+\label{tab:scenario_2e}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model - Coefficients exhibit 60\% decrease} \\
+\hline
+Coefficient & Term \\
+\hline
+61.04 & $F_{29}=v_1$ \\
+24.41 & $F_{98}=v_3$ \& $F_{34}=v_2$ \\
+9.77  & $F_{50}=v_2$ \\
+3.91  & $F_{22}=v_1$ \\
+1.56  & $\mathit{INTERCEPT}$ \\
+0.63  & $F_{69}=v_1$ \& $F_{23}=v_1$ \\
+0.25  & $F_{10}=v_2$ \\
+0.1   & $F_{82}=v_1$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 51 & $F_{69}$ & $\surd$ \\
+ 2 & 51 & $F_{50}$ & $\surd$ \\
+ 3 & 51 & $F_{34}$ & $\surd$ \\
+ 4 & 51 & $F_{23}$ & $\surd$ \\
+ 5 & 51 & $F_{22}$ & $\surd$ \\
+ 6 & 50 & $F_{98}$ & $\surd$ \\
+ 7 & 50 & $F_{82}$ & $\surd$ \\
+ 8 & 50 & $F_{29}$ & $\surd$ \\
+ 9 & 50 & $F_{10}$ & $\surd$ \\
+10 & 2  & $F_{99}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+These final two scenarios both satisfy the "heavy-hitters" requirement.
+Unsurprisingly, in both cases the analysis finds all nine factors that are present in the true models.
+Furthermore, the drop-off in occurrence counts between the ninth factor and the tenth factor is clear and indicates which factors are significant.
+We can therefore conclude that when no noise is introduced into the system and the coefficients satisfy "heavy-hitters", the analysis algorithm is able to recover the true model accurately.
+However, when the coefficients do not satisfy "heavy-hitters", the analysis algorithm can produce results from which it can be difficult to draw conclusions with confidence.
+
+\section{Effects of Noise} \label{sect:noise}
+
+In the previous section, we explored how the analysis algorithm can perform better when the true model satisfies the "heavy-hitters" requirement.
+In the best cases, for example in Table \ref{tab:scenario_2e}, the analysis finds all significant factors and indicates those that are insignificant.
+This is shown by the extreme drop-off in the occurrence count between the ninth and tenth factors in the ranking.
+However, such a clear drop-off in occurrence counts is not seen in the analysis of many screening experiments.
+Noise in the system often affects the data collected in all experiments causing the drop-off to be more gradual, making it more difficult to distinguish the factors that are significant from those that are insignificant.
+
+In this section, we explore how noise affects our analysis and how different types of true models are affected in different ways.
+Random uniform noise is therefore added to our output data measurements and we then attempt to recover the significant factors.
+The magnitude of the noise is characterized as a percentage of the range of all output measurements.
+For example, if the smallest output measurement is 1 and the greatest is 11 (before adding artificial noise), then the range is $11 - 1 = 10$.
+And if 10\% artificial noise is added, then 10\% of 10 is 1, and the smallest measurement (that was previously 1) becomes a uniform random variable with mean 1, U(0.5,1.5).
+Similarly, 20\% artificial noise causes the smallest output measurement to become a uniform random variable U(0,2).
+For a given run of our analysis, all random variables are sampled, and their values are used during the execution.
+In the extreme case with 100\% artificial noise, all output measurements could be the same in any given analysis run, in which case no knowledge at all could be discerned from the data by any algorithm.
+
+In this section, we investigate how earlier scenarios might change with the addition of noise.
+We investigate adding 10\% noise to scenarios 2A, 2C, 2D and 2E.
+This shows us how noise affects true models that satisfy the "heavy-hitters" requirement and how it affects those that do not.
+In particular, we observe an interesting phenomenon when noise is added to a model that strongly satisfies the "heavy-hitters" requirement.
+
+First we produce scenario 2F in Table \ref{tab:scenario_2f} by adding 10\% noise to scenario 2A in Table \ref{tab:scenario_2a} which does not satisfy the "heavy-hitters" requirement.
+The occurrence counts look similar to those from scenario 2A where no noise was added.
+Here, a gradual drop-off is seen in the occurrence counts, and some of the true factors have slightly different occurrence counts.
+Particularly, the factors involved in interactions, $F_{34}, F_{98}, F_{23}, F_{69}$, show uncertainty in the occurrence counts because they each must share a coefficient with another factor.
+However, the top nine factors listed correspond to the nine factors in the true model, and the noise does not have a major effect.
+
+\begin{table}
+\caption{Robustness Scenario 2F - Scenario 2A with Noise (10\%)}
+\label{tab:scenario_2f}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model : Noise 10\%} \\
+\hline
+Coefficient & Term \\
+\hline
+0.1 & $F_{29}=v_1$          \\
+0.1 & $F_{98}=v_3$ \& $F_{34}=v_2$ \\
+0.1 & $F_{50}=v_2$          \\
+0.1 & $F_{22}=v_1$          \\
+0.1 & $\mathit{INTERCEPT}$      \\
+0.1 & $F_{69}=v_1$ \& $F_{23}=v_1$ \\
+0.1 & $F_{10}=v_2$          \\
+0.1 & $F_{82}=v_1$          \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 50 & $F_{82}$ & $\surd$ \\
+ 2 & 50 & $F_{50}$ & $\surd$ \\
+ 3 & 50 & $F_{29}$ & $\surd$ \\
+ 4 & 50 & $F_{22}$ & $\surd$ \\
+ 5 & 50 & $F_{10}$ & $\surd$ \\
+ 6 & 41 & $F_{34}$ & $\surd$ \\
+ 7 & 40 & $F_{98}$ & $\surd$ \\
+ 8 & 23 & $F_{23}$ & $\surd$ \\
+ 9 & 21 & $F_{69}$ & $\surd$ \\
+10 & 8  & $F_{2}$  & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+We produce the scenario 2G in Table \ref{tab:scenario_2g} by adding 10\% noise to scenario 2C which better satisfies the "heavy-hitters" requirement.
+In this scenario, not only are the occurrence counts smaller than those from scenario 2C, but three of the true factors do not appear on the list while two factors not in the true model do.
+This is in sharp contrast to scenario 2C where all nine true factors appeared as the first nine factors in the occurrence counts table and there was an extremely sharp drop-off after the nine factors.
+The three factors in the true model missing from the occurrence counts, $F_{69}, F_{23}, F_{82}$ have the smallest coefficients, and are replaced by two factors that are not in the true model at all, $F_{14}, F_{7}$.
+This scenario is more affected by noise than scenario 2F in Table \ref{tab:scenario_2f} because the noise tends to "drown" out terms with coefficients that are small in comparison to the others.
+
+\begin{table}
+\caption{Robustness Scenario 2G - Scenario 2C with Noise (10\%)}
+\label{tab:scenario_2g}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model : Noise 10\%} \\
+\hline
+Coefficient & Term \\
+\hline
+1.71 & $F_{29} = v_1$          \\
+1.14 & $F_{98} = v_3$ \& $F_{34} = v_2$ \\
+0.76 & $F_{50} = v_2$          \\
+0.51 & $F_{22} = v_1$          \\
+0.34 & $\mathit{INTERCEPT}$  \\
+0.23 & $F_{69} = v_1$ \& $F_{23} = v_1$ \\
+0.15 & $F_{10} = v_2$          \\
+0.1  & $F_{82} = v_1$          \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 58 & $F_{10}$ & $\surd$ \\
+ 2 & 55 & $F_{29}$ & $\surd$ \\
+ 3 & 50 & $F_{98}$ & $\surd$ \\
+ 4 & 50 & $F_{50}$ & $\surd$ \\
+ 5 & 50 & $F_{34}$ & $\surd$ \\
+ 6 & 50 & $F_{22}$ & $\surd$ \\
+ 7 & 34 & $F_{14}$ & \\
+ 8 & 24 & $F_{7}$  & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The third scenario adds 10\% noise to scenario 2D to produce scenario 2H in Table \ref{tab:scenario_2h} which satisfies the "heavy-hitters" requirement fairly well.
+Now, only five factors from the true model appear as the first five factors in the occurrence counts table.
+There is no indication from the occurrence counts that the other four factors in the true model are significant at all.
+This is again in sharp contrast with scenario 2D where all nine true factors are clearly significant from the occurrence counts table.
+Again, the four true factors missing from the occurrence counts, $F_{69}$, $F_{23}$, $F_{10}$ and $F_{82}$ have the smallest coefficients.
+
+\begin{table}
+\caption{Robustness Scenario 2H - Scenario 2D with Noise (10\%)}
+\label{tab:scenario_2h}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model : Noise 10\%} \\
+\hline
+Coefficient & Term \\
+\hline
+12.8 & $F_{29} = v_1$          \\
+6.4  & $F_{98} = v_3$ \& $F_{34} = v_2$ \\
+3.2  & $F_{50} = v_2$          \\
+1.6  & $F_{22} = v_1$          \\
+0.8  & $\mathit{INTERCEPT}$    \\
+0.4  & $F_{69} = v_1$ \& $F_{23} = v_1$ \\
+0.2  & $F_{10} = v_2$          \\
+0.1  & $F_{82} = v_1$          \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 68 & $F_{29}$ & $\surd$ \\
+ 2 & 60 & $F_{50}$ & $\surd$ \\
+ 3 & 52 & $F_{34}$ & $\surd$ \\
+ 4 & 50 & $F_{98}$ & $\surd$ \\
+ 5 & 50 & $F_{22}$ & $\surd$ \\
+ 6 & 32 & $F_{92}$ & \\
+ 7 & 21 & $F_{42}$ & \\
+ 8 & 20 & $F_{44}$ & \\
+ 9 & 14 & $F_{14}$ & \\
+10 & 13 & $F_{64}$ & \\
+11 & 12 & $F_{76}$ & \\
+12 & 12 & $F_{66}$ & \\
+13 & 9  & $F_{70}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+Scenario 2I adds 10\% noise to scenario 2E which most strongly satisfies the "heavy-hitters" requirement.
+Similar to the previous scenario, only the five factors with the largest coefficients from the true model are the top five factors in the occurrence counts.
+The four factors with the smallest coefficients cannot be found in the occurrence counts table.
+This is again in sharp contrast with scenario 2F where all nine factors in the true model were clearly found significant in the occurrence counts table.
+
+These previous four scenarios 2F, 2G, 2H and 2I show an interesting trend.
+As the "heavy-hitters" requirement is more and more strongly satisfied in scenarios with noise, the true factors with smallest coefficients (least affecting the true model) start to disappear from the occurrence counts and it becomes harder, or impossible, to distinguish them as significant factors.
+This is interesting because when these same models are not affected by noise, it is easiest to distinguish the less significant factors when the "heavy-hitters" requirement is most strongly satisfied.
+Therefore, it appears that noise more highly affects the true models that more strongly satisfy the "heavy-hitters" requirement.
+This is simply because even small amounts of noise easily overpower and drown out the less significant factors.
+More specifically, when a coefficient is not greater than the noise in the system (dictated by the term with the largest coefficient), then its effects are likely unrecoverable.
+
+\begin{table}
+\caption{Robustness Scenario 2I - Scenario 2E with Noise (10\%)}
+\label{tab:scenario_2i}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model : Noise 10\%} \\
+\hline
+Coefficient & Term \\
+\hline
+61.04 & $F_{29} = v_1$ \\
+24.41 & $F_{98} = v_3$ \& $F_{34} = v_2$ \\
+9.77  & $F_{50} = v_2$ \\
+3.91  & $F_{22} = v_1$ \\
+1.56  & $\mathit{INTERCEPT}$ \\
+0.63  & $F_{69} = v_1$ \& $F_{23} = v_1$ \\
+0.25  & $F_{10} = v_2$ \\
+0.1   & $F_{82} = v_1$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$\mathit{nModels}=50$ & $\mathit{nNewModels}=50$ & $\mathit{nTerms}=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 51 & $F_{98}$ & $\surd$ \\
+ 2 & 51 & $F_{34}$ & $\surd$ \\
+ 3 & 50 & $F_{50}$ & $\surd$ \\
+ 4 & 50 & $F_{29}$ & $\surd$ \\
+ 5 & 50 & $F_{22}$ & $\surd$ \\
+ 6 & 36 & $F_{15}$ & \\
+ 7 & 28 & $F_{32}$ & \\
+ 8 & 28 & $F_{12}$ & \\
+ 9 & 27 & $F_{30}$ & \\
+10 & 26 & $F_{95}$ & \\
+11 & 12 & $F_{55}$ & \\
+12 & 11 & $F_{42}$ & \\
+13 & 11 & $F_{5}$  & \\
+14 &  9 & $F_{87}$ & \\
+15 &  8 & $F_{66}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+\section{Separation to Cope with Noise} \label{sect:separation}
+
+In Section \ref{sect:noise}, there are scenarios where noise causes serious problems in recovery of the true model with the analysis algorithm.
+More specifically, when the "heavy-hitters" requirement is satisfied, it is difficult to recover all true factors in the presence of noise.
+However, in Chapter \ref{chptr:construction}, we introduced the possibility that higher separation in the locating array might provide more trustworthy results.
+This section explores this possibility and strives to illustrate how higher separation can help our analysis.
+We use the parameter $\delta$ to define the separation of the locating array.
+
+We begin with a few scenarios to illustrate the basic effects of separation.
+We use the same true model and factors, and compare how two locating arrays respond to different levels of noise when running analysis.
+Both locating arrays have 10 factors, $F_{1}, F_{2}, \dots, F_{10}$, each with three levels, $v_1, v_2, v_3$.
+The first locating array has separation $\delta=1$ (a standard locating array) and contains 28 rows, while the second locating array has separation $\delta=3$ and contains 58 rows.
+The true model along with the analysis parameters are given in scenario 3A in Table \ref{tab:scenario_3a}.
+This scenario satisfies the "heavy-hitters" requirement fairly well since most coefficients are well differentiated.
+
+\begin{table}
+\caption{Robustness Scenario 3A - Separation to Cope With Noise}
+\label{tab:scenario_3a}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model} \\
+\hline
+Coefficient & Term \\
+\hline
+0.5  & $\mathit{INTERCEPT}$ \\
+0.78 & $F_{4}=v_1$ \\
+4.02 & $F_{9}=v_1$ \\
+0.99 & $F_{5}=v_2$ \& $F_{2}=v_1$ \\
+2.49 & $F_{8}=v_2$ \& $F_{4}=v_1$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=25$ & $nNewModels=50$ & $nTerms=5$ \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The analysis is first executed with no noise and the occurrence counts are shown in Table \ref{tab:separation_noise_0}.
+Those for $\delta=1$ are shown first followed by those for $\delta=3$.
+Next, Table \ref{tab:separation_noise_10}, Table \ref{tab:separation_noise_20} and Table \ref{tab:separation_noise_30} show occurrence counts for noise increasing from 10\% to 30\% for $\delta=1$ and $\delta=3$.
+Table \ref{tab:separation_noise_10} shows all true factors first and then a distinct drop-off.
+Interestingly, Table \ref{tab:separation_noise_20} misses one of the true factors when $\delta=1$, but Table \ref{tab:separation_noise_30} again shows all of the true factors first and then a drop-off.
+The missing factor $F_5$ in Table \ref{tab:separation_noise_20} is because the noise is random and eliminated its effects in that particular run.
+$F_5$ is also part of an interaction with a smaller coefficient and is therefore more susceptible to noise.
+
+\begin{table}
+\caption{Separation to Cope With Noise (No Noise)}
+\label{tab:separation_noise_0}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=1$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 49 & $F_{4}$  & $\surd$ \\
+ 2 & 28 & $F_{8}$  & $\surd$ \\
+ 3 & 27 & $F_{9}$  & $\surd$ \\
+ 4 & 24 & $F_{2}$  & $\surd$ \\
+ 5 & 23 & $F_{5}$  & $\surd$ \\
+ 6 &  3 & $F_{10}$ & \\
+ 7 &  3 & $F_{7}$  & \\
+ 8 &  2 & $F_{3}$  & \\
+ 9 &  2 & $F_{1}$  & \\
+10 &  1 & $F_{6}$  & \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=3$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 51 & $F_{4}$ & $\surd$ \\
+ 2 & 29 & $F_{8}$ & $\surd$ \\
+ 3 & 28 & $F_{9}$ & $\surd$ \\
+ 4 & 15 & $F_{5}$ & $\surd$ \\
+ 5 & 14 & $F_{2}$ & $\surd$ \\
+ 6 &  5 & $F_{7}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+\begin{table}
+\caption{Separation to Cope With Noise (10\%)}
+\label{tab:separation_noise_10}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=1$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 48 & $F_{4}$ & $\surd$ \\
+ 2 & 28 & $F_{9}$ & $\surd$ \\
+ 3 & 26 & $F_{8}$ & $\surd$ \\
+ 4 & 23 & $F_{5}$ & $\surd$ \\
+ 5 & 23 & $F_{2}$ & $\surd$ \\
+ 6 & 6 & $F_{3}$ & \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=3$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 47 & $F_{4}$  & $\surd$ \\
+ 2 & 28 & $F_{9}$  & $\surd$ \\
+ 3 & 28 & $F_{8}$  & $\surd$ \\
+ 4 & 26 & $F_{5}$  & $\surd$ \\
+ 5 & 26 & $F_{2}$  & $\surd$ \\
+ 6 &  4 & $F_{10}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+\begin{table}
+\caption{Separation to Cope With Noise (20\%)}
+\label{tab:separation_noise_20}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=1$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 57 & $F_{4}$ & $\surd$ \\
+ 2 & 34 & $F_{8}$ & $\surd$ \\
+ 3 & 26 & $F_{9}$ & $\surd$ \\
+ 4 & 26 & $F_{2}$ & $\surd$ \\
+ 5 &  6 & $F_{1}$ & \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=3$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 41 & $F_{4}$ & $\surd$ \\
+ 2 & 30 & $F_{8}$ & $\surd$ \\
+ 3 & 27 & $F_{5}$ & $\surd$ \\
+ 4 & 26 & $F_{9}$ & $\surd$ \\
+ 5 & 26 & $F_{2}$ & $\surd$ \\
+ 6 &  6 & $F_{3}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+\begin{table}
+\caption{Separation to Cope With Noise (30\%)}
+\label{tab:separation_noise_30}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=1$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 48 & $F_{4}$ & $\surd$ \\
+ 2 & 33 & $F_{9}$ & $\surd$ \\
+ 3 & 29 & $F_{8}$ & $\surd$ \\
+ 4 & 20 & $F_{5}$ & $\surd$ \\
+ 5 & 16 & $F_{2}$ & $\surd$ \\
+ 6 &  8 & $F_{7}$ & \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=3$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 59 & $F_{4}$  & $\surd$ \\
+ 2 & 40 & $F_{8}$  & $\surd$ \\
+ 3 & 26 & $F_{9}$  & $\surd$ \\
+ 4 & 18 & $F_{2}$  & $\surd$ \\
+ 5 & 11 & $F_{5}$  & $\surd$ \\
+ 6 &  6 & $F_{10}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+With 40\% noise in Table \ref{tab:separation_noise_40}, the locating array with separation $\delta=1$ fails to find all true factors and it introduces a false factor.
+However, the locating array with separation $\delta=3$ continues to show all five true factors as the top five factors. 
+The locating array with higher separation appears to do a better job of finding true factors as the other locating array begins to fail.
+
+\begin{table}
+\caption{Separation to Cope With Noise (40\%)}
+\label{tab:separation_noise_40}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=1$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 49 & $F_{4}$ & $\surd$ \\
+ 2 & 31 & $F_{8}$ & $\surd$ \\
+ 3 & 28 & $F_{9}$ & $\surd$ \\
+ 4 & 17 & $F_{6}$ & \\
+ 5 & 17 & $F_{2}$ & $\surd$ \\
+ 6 &  8 & $F_{3}$ & \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=3$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 38 & $F_{5}$ & $\surd$ \\
+ 2 & 27 & $F_{9}$ & $\surd$ \\
+ 3 & 26 & $F_{8}$ & $\surd$ \\
+ 4 & 26 & $F_{4}$ & $\surd$ \\
+ 5 & 26 & $F_{2}$ & $\surd$ \\
+ 6 & 10 & $F_{6}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+Now we see how much noise the locating array with higher separation can tolerate before its occurrence counts begin to break down.
+Table \ref{tab:separation_noise_50} shows the occurrence counts for 50\% noise.
+These occurrence counts are still correct.
+Those in Table \ref{tab:separation_noise_60} are for 60\% noise.
+A false factor has now been introduced with 60\% noise, but the occurrence counts still show all five true factors, though not as the top five.
+
+\begin{table}
+\caption{Separation to Cope With Noise (50\%)}
+\label{tab:separation_noise_50}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=3$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 34 & $F_{9}$  & $\surd$ \\
+ 2 & 26 & $F_{4}$  & $\surd$ \\
+ 3 & 24 & $F_{5}$  & $\surd$ \\
+ 4 & 24 & $F_{2}$  & $\surd$ \\
+ 5 & 23 & $F_{8}$  & $\surd$ \\
+ 6 & 16 & $F_{7}$  & \\
+ 7 &  8 & $F_{10}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+\begin{table}
+\caption{Separation to Cope With Noise (60\%)}
+\label{tab:separation_noise_60}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=3$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 34 & $F_{5}$ & $\surd$ \\
+ 2 & 29 & $F_{9}$ & $\surd$ \\
+ 3 & 26 & $F_{8}$ & $\surd$ \\
+ 4 & 26 & $F_{4}$ & $\surd$ \\
+ 5 & 15 & $F_{7}$ & \\
+ 6 & 14 & $F_{2}$ & $\surd$ \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The occurrence counts in Table \ref{tab:separation_noise_70} are for 70\% noise.
+These occurrence counts still show all five true factors but they are now significantly off.
+Multiple false factors are found and are ranked fairly high.
+As expected, the true factors are ranked lower in the occurrence counts as more noise is added to the system.
+Furthermore, the drop-off in the occurrence counts becomes less distinct as more noise is added.
+Therefore, when the true model is unknown, the drop-off in the occurrence counts can indicate the certainty of the results.
+
+\begin{table}
+\caption{Separation to Cope With Noise (70\%)}
+\label{tab:separation_noise_70}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=3$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 44 & $F_{9}$  & $\surd$ \\
+ 2 & 32 & $F_{7}$  & \\
+ 3 & 25 & $F_{3}$  & \\
+ 4 & 22 & $F_{8}$  & $\surd$ \\
+ 5 & 15 & $F_{4}$  & $\surd$ \\
+ 6 & 13 & $F_{5}$  & $\surd$ \\
+ 7 & 11 & $F_{2}$  & $\surd$ \\
+ 8 & 11 & $F_{1}$  & \\
+ 9 &  2 & $F_{10}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+Table \ref{tab:separation_noise_80} shows the occurrence counts with 80\% noise.
+The occurrence counts from 80\% noise also introduce false factors, but all five true factors still seem to be significant.
+Therefore, while the locating array with separation $\delta=1$ begins to fail with 20\% and 40\% noise, the locating array with separation $\delta=3$ still performs well through 60\% noise.
+This supports the hypothesis that higher separation, at least in some cases, leads to more accurate recovery.
+
+\begin{table}
+\caption{Separation to Cope With Noise (80\%)}
+\label{tab:separation_noise_80}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=3$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 31 & $F_{9}$ & $\surd$ \\
+ 2 & 28 & $F_{3}$ & \\
+ 3 & 26 & $F_{8}$ & $\surd$ \\
+ 4 & 24 & $F_{6}$ & \\
+ 5 & 22 & $F_{4}$ & $\surd$ \\
+ 6 & 15 & $F_{5}$ & $\surd$ \\
+ 7 & 11 & $F_{2}$ & $\surd$ \\
+ 8 &  7 & $F_{1}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+Recall that in Section \ref{sect:noise}, scenarios 2G, 2H, and 2I were heavily affected by noise and many true factors were not found in the occurrence counts.
+In the remainder of this section, a new locating array with a higher level of separation $\delta=4$ is used to check if separation improves the recovery.
+The same true models are used and the first is given in Table \ref{tab:scenario_3b}.
+
+\begin{table}
+\caption{Robustness Scenario 3B - Adding Separation to Scenario 2G}
+\label{tab:scenario_3b}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model : Noise 10\%} \\
+\hline
+Coefficient & Term \\
+\hline
+1.71 & $F_{29}=v_1$ \\
+1.14 & $F_{98}=v_3$ \& $F_{34}=v_2$ \\
+0.76 & $F_{50}=v_2$ \\
+0.51 & $F_{22}=v_1$ \\
+0.34 & $\mathit{INTERCEPT}$ \\
+0.23 & $F_{69}=v_1$ \& $F_{23}=v_1$ \\
+0.15 & $F_{10}=v_2$ \\
+0.1  & $F_{82}=v_1$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=4$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 51 & $F_{82}$ & $\surd$ \\
+ 2 & 51 & $F_{34}$ & $\surd$ \\
+ 3 & 51 & $F_{22}$ & $\surd$ \\
+ 4 & 50 & $F_{98}$ & $\surd$ \\
+ 5 & 50 & $F_{69}$ & $\surd$ \\
+ 6 & 50 & $F_{50}$ & $\surd$ \\
+ 7 & 50 & $F_{29}$ & $\surd$ \\
+ 8 & 50 & $F_{23}$ & $\surd$ \\
+ 9 & 44 & $F_{10}$ & $\surd$ \\
+10 & 13 & $F_{6}$  & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The occurrence counts in Table \ref{tab:scenario_3b} rank all nine true factors as the top nine significant factors.
+This is a significant improvement over the locating array with $\delta = 1$ used that resulted in only six true factors occurring.
+It is apparent that higher separation helps recover more true factors.
+
+The second true model that caused trouble previously in Section \ref{sect:noise} is shown in Table \ref{tab:scenario_3c} with the new occurrence counts after using a locating array with separation $\delta=4$.
+Now, the occurrence counts show six true factors even with separation $\delta=4$.
+This is a very slight improvement over the locating array with separation $\delta=1$ in Section \ref{sect:noise} where just five true factors were shown.
+It is interesting that even though higher separation was used, the true factors could still not be recovered from a true model that strongly satisfies the "heavy-hitters" requirement.
+This is because the noise in the system (dictated by the term with the largest coefficient), overwhelms the terms with smaller coefficients  regardless of the separation.
+
+\begin{table}
+\caption{Robustness Scenario 3C - Adding Separation to Scenario 2H}
+\label{tab:scenario_3c}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model : Noise 10\%} \\
+\hline
+Coefficient & Term \\
+\hline
+12.8 & $F_{29}=v_1$                       \\
+6.4  & $F_{98}=v_3$ \& $F_{34}=v_2$ \\
+3.2  & $F_{50}=v_2$                       \\
+1.6  & $F_{22}=v_1$                       \\
+0.8  & $\mathit{INTERCEPT}$                   \\
+0.4  & $F_{69}=v_1$ \& $F_{23}=v_1$ \\
+0.2  & $F_{10}=v_2$                       \\
+0.1  & $F_{82}=v_1$                       \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=4$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 53 & $F_{34}$ & $\surd$ \\
+ 2 & 53 & $F_{22}$ & $\surd$ \\
+ 3 & 52 & $F_{29}$ & $\surd$ \\
+ 4 & 51 & $F_{98}$ & $\surd$ \\
+ 5 & 50 & $F_{50}$ & $\surd$ \\
+ 6 & 49 & $F_{3}$  & \\
+ 7 & 45 & $F_{78}$ & \\
+ 8 & 36 & $F_{10}$ & $\surd$ \\
+ 9 & 19 & $F_{59}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The third true model that caused issues in Section \ref{sect:noise} is shown in Table \ref{tab:scenario_3d} along with the new occurrence counts.
+These occurrence counts are almost identical to those from the locating array with lower separation.
+The same five true factors are selected as the top five significant factors, but the four remaining true factors are lost.
+This suggests that even with higher separation, if a true model strongly satisfies the "heavy-hitters" requirement, then the true factors with smallest coefficients may not be recovered.
+Furthermore, although higher separation helps recovery in many cases, there are some scenarios where it does not seem to help as much such as in Table \ref{tab:scenario_3d}, where the terms with smaller coefficients are overwhelmed by the noise in the system which is determined by the terms with larger coefficients.
+
+\begin{table}
+\caption{Robustness Scenario 3D - Adding Separation to Scenario 2I}
+\label{tab:scenario_3d}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model} \\
+\hline
+Coefficient & Term \\
+\hline
+61.04 & $F_{29}=v_1$ \\
+24.41 & $F_{98}=v_3$ \& $F_{34}=v_2$ \\
+9.77  & $F_{50}=v_2$ \\
+3.91  & $F_{22}=v_1$ \\
+1.56  & $\mathit{INTERCEPT}$ \\
+0.63  & $F_{69}=v_1$ \& $F_{23}=v_1$ \\
+0.25  & $F_{10}=v_2$ \\
+0.1   & $F_{82}=v_1$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts ($\delta=4$)} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 62 & $F_{29}$ & $\surd$ \\
+ 2 & 56 & $F_{22}$ & $\surd$ \\
+ 3 & 50 & $F_{98}$ & $\surd$ \\
+ 4 & 50 & $F_{50}$ & $\surd$ \\
+ 5 & 50 & $F_{34}$ & $\surd$ \\
+ 6 & 33 & $F_{78}$ & \\
+ 7 & 33 & $F_{25}$ & \\
+ 8 & 24 & $F_{4}$  & \\
+ 9 & 18 & $F_{82}$ & \\
+10 & 18 & $F_{66}$ & \\
+11 & 17 & $F_{83}$ & \\
+12 & 16 & $F_{39}$ & \\
+13 & 13 & $F_{76}$ & \\
+14 & 11 & $F_{60}$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+\section{Systems Involving a Large Number of Terms} \label{sect:interesting}
+
+This section discusses an interesting observation that was encountered when investigating robustness and factor recovery.
+These final scenarios show how a large number of terms in the true model can cause issues with the recovery, even with no actual noise added to the true model.
+We use a locating array with 100 factors, $F_{1}, F_{2}, \dots, F_{100}$, and each of these factors can be set to three levels, $v_1, v_2, v_3$.
+None of the scenarios in this section introduces any noise into the system.
+
+The first scenario is given in Table \ref{tab:scenario_4a} and uses a true model with 16 terms consisting of both main effects and interactions.
+The true model does not strongly satisfy the "heavy-hitters" requirement since some coefficients are close to others.
+But without any noise, scenario 2A in Table \ref{tab:scenario_2a} suggests that the significant factors might still be ranked at the top of the occurrence counts.
+However, the occurrence counts completely fail to recover the significant factors, and instead, show factors that are seemingly random.
+Only five of the top ten ranked factors are actually significant in the true model.
+
+\begin{table}
+\caption{Robustness Scenario 4A - Systems Involving a Large Number of Terms (16 Terms, $nTerms=11$)}
+\label{tab:scenario_4a}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model} \\
+\hline
+Coefficient & Term \\
+\hline
+1.68472  & $\mathit{INTERCEPT}$ \\
+4.74096  & $F_{50}=v_2$ \\
+4.61089  & $F_{98}=v_1$ \\
+3.51114  & $F_{22}=v_1$ \\
+3.06619  & $F_{41}=v_1$ \\
+2.88918  & $F_{68}=v_2$ \\
+2.70801  & $F_{2}=v_3$ \\
+2.02174  & $F_{82}=v_1$ \\
+1.66709  & $F_{10}=v_2$ \\
+0.645456 & $F_{29}=v_1$ \\
+0.505764 & $F_{43}=v_3$ \\
+3.84451  & $F_{74}=v_2$ \& $F_{1}=v_1$ \\
+2.65065  & $F_{67}=v_3$ \& $F_{12}=v_2$ \\
+2.6396   & $F_{45}=v_2$ \& $F_{12}=v_2$ \\
+1.90092  & $F_{69}=v_1$ \& $F_{23}=v_1$ \\
+0.113597 & $F_{98}=v_3$ \& $F_{34}=v_2$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=11$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 97 & $F_{5}$  & \\
+ 2 & 79 & $F_{1}$  & $\surd$ \\
+ 3 & 77 & $F_{22}$ & $\surd$ \\
+ 4 & 64 & $F_{57}$ & \\
+ 5 & 64 & $F_{34}$ & $\surd$ \\
+ 6 & 50 & $F_{98}$ & $\surd$ \\
+ 7 & 50 & $F_{88}$ & \\
+ 8 & 50 & $F_{50}$ & $\surd$ \\
+ 9 & 50 & $F_{11}$ & \\
+10 & 48 & $F_{70}$ & \\
+11 & 48 & $F_{62}$ & \\
+12 & 48 & $F_{47}$ & \\
+13 & 46 & $F_{39}$ & \\
+14 & 33 & $F_{31}$ & \\
+15 & 14 & $F_{77}$ & \\
+16 & 12 & $F_{12}$ & $\surd$ \\
+17 & 10 & $F_{68}$ & $\surd$ \\
+$\vdots$ & $\vdots$ & $\vdots$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+Table \ref{tab:scenario_4a} is likely unable to recover the significant factors because the many terms obscure the effects of each other.
+In the remainder of this section, we remove two terms at a time, beginning with the terms with the smallest coefficients, and observe how the recovery is affected.
+As terms are removed, they stop obscuring the effects of each other and the recovery is much more successful.
+
+The second scenario is given in Table \ref{tab:scenario_4b} and uses the same true model as the previous scenario but without the two interactions with the smallest coefficients.
+There are now 14 terms in the true model and the analysis is run once again with all parameters remaining the same.
+Now, seven of the top ten ranked factors in the occurrence counts are significant in the true model.
+Although this is an improvement over the previous scenario, the occurrence counts still fail to recover all significant factors.
+
+\begin{table}
+\caption{Robustness Scenario 4B - Systems Involving a Large Number of Terms (14 Terms, $nTerms=11$)}
+\label{tab:scenario_4b}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model} \\
+\hline
+Coefficient & Term \\
+\hline
+1.68472  & $\mathit{INTERCEPT}$ \\
+4.74096  & $F_{50}=v_2$ \\
+4.61089  & $F_{98}=v_1$ \\
+3.51114  & $F_{22}=v_1$ \\
+3.06619  & $F_{41}=v_1$ \\
+2.88918  & $F_{68}=v_2$ \\
+2.70801  & $F_{2}=v_3$ \\
+2.02174  & $F_{82}=v_1$ \\
+1.66709  & $F_{10}=v_2$ \\
+0.645456 & $F_{29}=v_1$ \\
+0.505764 & $F_{43}=v_3$ \\
+3.84451  & $F_{74}=v_2$ \& $F_{1}=v_1$ \\
+2.65065  & $F_{67}=v_3$ \& $F_{12}=v_2$ \\
+2.6396   & $F_{45}=v_2$ \& $F_{12}=v_2$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=11$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 77 & $F_{41}$ & $\surd$ \\
+ 2 & 59 & $F_{2}$  & $\surd$ \\
+ 3 & 54 & $F_{98}$ & $\surd$ \\
+ 4 & 50 & $F_{50}$ & $\surd$ \\
+ 5 & 50 & $F_{22}$ & $\surd$ \\
+ 6 & 38 & $F_{8}$  & \\
+ 7 & 38 & $F_{1}$  & $\surd$ \\
+ 8 & 37 & $F_{12}$ & $\surd$ \\
+ 9 & 35 & $F_{37}$ & \\
+10 & 34 & $F_{88}$ & \\
+11 & 34 & $F_{67}$ & $\surd$ \\
+12 & 32 & $F_{73}$ & \\
+%13 & 31 & $F_{6}$  & \\
+%14 & 30 & $F_{32}$ & \\
+%15 & 20 & $F_{54}$ & \\
+%16 & 18 & $F_{57}$ & \\
+%17 & 18 & $F_{13}$ & \\
+%18 & 17 & $F_{77}$ & \\
+$\vdots$ & $\vdots$ & $\vdots$ & \\
+19 & 17 & $F_{64}$ & \\
+20 & 16 & $F_{82}$ & $\surd$ \\
+21 & 14 & $F_{97}$ & \\
+22 & 14 & $F_{21}$ & \\
+23 & 13 & $F_{94}$ & \\
+24 & 10 & $F_{74}$ & $\surd$ \\
+$\vdots$ & $\vdots$ & $\vdots$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The next scenario given in Table \ref{tab:scenario_4c} uses the same true model as the previous scenario 4B but without the two main effects with the smallest coefficients.
+There are now 12 terms in the true model and everything else remains the same.
+The occurrence counts, however, again fail to recover the significant factors.
+
+\begin{table}
+\caption{Robustness Scenario 4C - Systems Involving a Large Number of Terms (12 Terms, $nTerms=11$)}
+\label{tab:scenario_4c}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model} \\
+\hline
+Coefficient & Term \\
+\hline
+1.68472  & $\mathit{INTERCEPT}$ \\
+4.74096  & $F_{50}=v_2$ \\
+4.61089  & $F_{98}=v_1$ \\
+3.51114  & $F_{22}=v_1$ \\
+3.06619  & $F_{41}=v_1$ \\
+2.88918  & $F_{68}=v_2$ \\
+2.70801  & $F_{2}=v_3$ \\
+2.02174  & $F_{82}=v_1$ \\
+1.66709  & $F_{10}=v_2$ \\
+3.84451  & $F_{74}=v_2$ \& $F_{1}=v_1$ \\
+2.65065  & $F_{67}=v_3$ \& $F_{12}=v_2$ \\
+2.6396   & $F_{45}=v_2$ \& $F_{12}=v_2$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=11$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 53 & $F_{67}$ & $\surd$ \\
+ 2 & 53 & $F_{12}$ & $\surd$ \\
+ 3 & 52 & $F_{10}$ & $\surd$ \\
+ 4 & 51 & $F_{99}$ & \\
+ 5 & 50 & $F_{50}$ & $\surd$ \\
+ 6 & 50 & $F_{31}$ & \\
+ 7 & 49 & $F_{13}$ & \\
+ 8 & 48 & $F_{80}$ & \\
+% 9 & 48 & $F_{58}$ & \\
+%10 & 47 & $F_{91}$ & \\
+%11 & 47 & $F_{75}$ & \\
+%12 & 47 & $F_{71}$ & \\
+%13 & 47 & $F_{38}$ & \\
+%14 & 32 & $F_{89}$ & \\
+%15 & 32 & $F_{8}$  & \\
+$\vdots$ & $\vdots$ & $\vdots$ & \\
+16 & 26 & $F_{47}$ & \\
+17 & 24 & $F_{93}$ & \\
+18 & 22 & $F_{98}$ & $\surd$ \\
+19 & 18 & $F_{64}$ & \\
+20 & 15 & $F_{26}$ & \\
+21 & 15 & $F_{20}$ & \\
+22 & 12 & $F_{40}$ & \\
+23 & 12 & $F_{2}$  & $\surd$ \\
+$\vdots$ & $\vdots$ & $\vdots$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The scenario in Table \ref{tab:scenario_4d} uses the same true model as the previous scenario 4C but without the two main effects with the smallest coefficients.
+There are now ten terms in the true model and everything else remains the same.
+The true model contains 11 unique significant factors.
+The occurrence counts display nine significant factors but the remaining two significant factors do not appear.
+
+\begin{table}
+\caption{Robustness Scenario 4D - Systems Involving a Large Number of Terms (10 Terms, $nTerms=11$)}
+\label{tab:scenario_4d}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model} \\
+\hline
+Coefficient & Term \\
+\hline
+1.68472  & $\mathit{INTERCEPT}$ \\
+4.74096  & $F_{50}=v_2$ \\
+4.61089  & $F_{98}=v_1$ \\
+3.51114  & $F_{22}=v_1$ \\
+3.06619  & $F_{41}=v_1$ \\
+2.88918  & $F_{68}=v_2$ \\
+2.70801  & $F_{2}=v_3$ \\
+2.02174  & $F_{82}=v_1$ \\
+3.84451  & $F_{74}=v_2$ \& $F_{1}=v_1$ \\
+2.65065  & $F_{67}=v_3$ \& $F_{12}=v_2$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=11$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 63 & $F_{22}$ & $\surd$ \\
+ 2 & 62 & $F_{41}$ & $\surd$ \\
+ 3 & 56 & $F_{2}$  & $\surd$ \\
+ 4 & 52 & $F_{50}$ & $\surd$ \\
+ 5 & 50 & $F_{98}$ & $\surd$ \\
+ 6 & 50 & $F_{1}$  & $\surd$ \\
+ 7 & 44 & $F_{97}$ & \\
+ 8 & 41 & $F_{68}$ & $\surd$ \\
+ 9 & 35 & $F_{26}$ & \\
+10 & 34 & $F_{56}$ & \\
+11 & 33 & $F_{8}$  & \\
+12 & 32 & $F_{31}$ & \\
+13 & 30 & $F_{88}$ & \\
+14 & 30 & $F_{29}$ & \\
+15 & 28 & $F_{67}$ & $\surd$ \\
+16 & 23 & $F_{82}$ & $\surd$ \\
+17 & 16 & $F_{92}$ & \\
+18 & 15 & $F_{38}$ & \\
+19 & 13 & $F_{58}$ & \\
+$\vdots$ & $\vdots$ & $\vdots$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The scenario in Table \ref{tab:scenario_4e} uses the same true model as the previous scenario, but the input parameter $nTerms$ is reduced from 11 to eight to stop possible overfitting of the true model that has ten significant terms.
+The resulting rankings of occurrence counts are almost identical to those in the previous scenario.
+The top six factors in both scenarios are the same while other factors in the ranking are similar as well.
+
+\begin{table}
+\caption{Robustness Scenario 4E - Systems Involving a Large Number of Terms (10 Terms, $nTerms=8$)}
+\label{tab:scenario_4e}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model} \\
+\hline
+Coefficient & Term \\
+\hline
+1.68472  & $\mathit{INTERCEPT}$ \\
+4.74096  & $F_{50}=v_2$ \\
+4.61089  & $F_{98}=v_1$ \\
+3.51114  & $F_{22}=v_1$ \\
+3.06619  & $F_{41}=v_1$ \\
+2.88918  & $F_{68}=v_2$ \\
+2.70801  & $F_{2}=v_3$ \\
+2.02174  & $F_{82}=v_1$ \\
+3.84451  & $F_{74}=v_2$ \& $F_{1}=v_1$ \\
+2.65065  & $F_{67}=v_3$ \& $F_{12}=v_2$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 78 & $F_{22}$ & $\surd$ \\
+ 2 & 66 & $F_{41}$ & $\surd$ \\
+ 3 & 56 & $F_{2}$  & $\surd$ \\
+ 4 & 51 & $F_{50}$ & $\surd$ \\
+ 5 & 50 & $F_{98}$ & $\surd$ \\
+ 6 & 46 & $F_{1}$  & $\surd$ \\
+ 7 & 35 & $F_{67}$ & $\surd$ \\
+ 8 & 25 & $F_{37}$ & \\
+ 9 & 19 & $F_{68}$ & $\surd$ \\
+10 & 15 & $F_{97}$ & \\
+11 & 15 & $F_{58}$ & \\
+12 & 13 & $F_{31}$ & \\
+13 & 11 & $F_{88}$ & \\
+$\vdots$ & $\vdots$ & $\vdots$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The final scenario in Table \ref{tab:scenario_4f} again uses the same true model as the previous scenario 4E but without the two terms with the smallest coefficients.
+The number of terms in the true model has therefore reduced from 16 in scenario 4A to eight terms in the current scenario.
+The true model now also contains eight unique significant factors.
+Interestingly, all eight significant factors are recovered as the top eight factors in terms of occurrence counts.
+Furthermore, there is a sharp drop-off from the eighth factor in the ranking to the ninth factor.
+Therefore, this scenario correctly indicates what factors are significant in the true model and which ones are insignificant.
+
+\begin{table}
+\caption{Robustness Scenario 4F - Systems Involving a Large Number of Terms (8 Terms, $nTerms=8$)}
+\label{tab:scenario_4f}
+
+\begin{tabularx}{\textwidth}{|2|8|}
+\hline
+\multicolumn{2}{|c|}{True Model} \\
+\hline
+Coefficient & Term \\
+\hline
+1.68472  & $\mathit{INTERCEPT}$ \\
+4.74096  & $F_{50}=v_2$ \\
+4.61089  & $F_{98}=v_1$ \\
+3.51114  & $F_{22}=v_1$ \\
+3.06619  & $F_{41}=v_1$ \\
+2.88918  & $F_{68}=v_2$ \\
+2.70801  & $F_{2}=v_3$ \\
+3.84451  & $F_{74}=v_2$ \& $F_{1}=v_1$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|3|4|3|}
+\hline
+\multicolumn{3}{|c|}{Analysis Parameters} \\
+\hline
+$nModels=50$ & $nNewModels=50$ & $nTerms=8$ \\
+\hline
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{|1|1|7|1|}
+\hline
+\multicolumn{4}{|c|}{Occurrence Counts} \\
+\hline
+Rank & Count & Factor & True \\
+\hline
+ 1 & 52 & $F_{41}$ & $\surd$ \\
+ 2 & 51 & $F_{68}$ & $\surd$ \\
+ 3 & 51 & $F_{50}$ & $\surd$ \\
+ 4 & 51 & $F_{2}$  & $\surd$ \\
+ 5 & 50 & $F_{98}$ & $\surd$ \\
+ 6 & 50 & $F_{22}$ & $\surd$ \\
+ 7 & 38 & $F_{1}$  & $\surd$ \\
+ 8 & 37 & $F_{74}$ & $\surd$ \\
+ 9 &  5 & $F_{12}$ & \\
+$\vdots$ & $\vdots$ & $\vdots$ & \\
+\hline
+\end{tabularx}
+
+\end{table}
+
+The difference between the first scenario and the final scenario is striking.
+The first scenario completely fails to recover the significant factors, while the final scenario does so very well.
+This is interesting because the main difference between these two scenarios is the number of terms in the true model.
+While the first scenario has 16 terms in the true model, the final scenario has eight terms.
+
+\section{Summary}
+
+We began this chapter with a discussion of the "heavy-hitters" requirement.
+The scenarios in Tables \ref{tab:scenario_2a}, \ref{tab:scenario_2b}, \ref{tab:scenario_2c}, \ref{tab:scenario_2d}, and \ref{tab:scenario_2e} show how, without any noise, more heavily satisfying the requirement leads to more accurate results.
+However, the scenarios in Tables \ref{tab:scenario_2f}, \ref{tab:scenario_2g}, \ref{tab:scenario_2h}, and \ref{tab:scenario_2i} show how, with noise in the system, more heavily satisfying the requirement causes the recovery to fail completely.
+
+Next, the topic of separation in locating arrays is revisited.
+The scenarios in Tables \ref{tab:separation_noise_0}, \ref{tab:separation_noise_10}, \ref{tab:separation_noise_20}, \ref{tab:separation_noise_30}, \ref{tab:separation_noise_40}, \ref{tab:separation_noise_50}, \ref{tab:separation_noise_60}, \ref{tab:separation_noise_70}, and \ref{tab:separation_noise_80} show how higher separation helps recovery with noise in the system.
+However, the scenarios in Tables \ref{tab:scenario_3b}, \ref{tab:scenario_3c}, and \ref{tab:scenario_3d} show that the benefit of separation has limits and it does not help recovery in some cases.
+
+Finally, the scenarios in Tables \ref{tab:scenario_2g}, \ref{tab:scenario_2h}, and \ref{tab:scenario_2i} show how noise can cause difficulty in recovering all significant terms.
+This is likely because the noise can overwhelm some significant factors with small coefficients.
+In Section \ref{sect:interesting}, although no artificial noise is added, the many terms in the true model likely obscure each other's effects and block the recovery.
+Hence, when the number of terms in the true model is decreased in the final scenario, the analysis is able to recover all significant terms.
